@@ -22,7 +22,7 @@ const db = new sqlite3.Database("./contacts.db", (err) => {
 
   // ✅ Create new contacts table with updated fields
   const createTableQuery = `
-      CREATE TABLE contacts (
+      CREATE TABLE IF NOT EXISTS contacts  (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         first_name TEXT,
         last_name TEXT,
@@ -62,6 +62,22 @@ const db = new sqlite3.Database("./contacts.db", (err) => {
       return console.error(" Failed to create contacts table:", err.message);
     console.log(" New 'contacts' table created.");
   });
+});
+// ✅ Create email_logs table
+const createEmailLogsTable = `
+    CREATE TABLE IF NOT EXISTS email_logs (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      emails TEXT NOT NULL,
+      subject TEXT NOT NULL,
+      message TEXT NOT NULL,
+      sent_at TEXT DEFAULT CURRENT_TIMESTAMP
+    );
+  `;
+
+db.run(createEmailLogsTable, (err) => {
+  if (err)
+    return console.error("❌ Failed to create email_logs table:", err.message);
+  console.log("✅ 'email_logs' table ensured.");
 });
 
 // ✅ Add new contact
@@ -133,7 +149,8 @@ app.delete("/api/contacts/:id", (req, res) => {
 });
 // ✉️ POST - Send bulk emails
 app.post("/api/send-bulk-email", async (req, res) => {
-  const { subject, message, recipients } = req.body;
+  const { subject, message, emails } = req.body;
+  const recipients = emails;
 
   if (!subject || !message || !recipients || recipients.length === 0) {
     return res.status(400).json({ error: "Missing required fields" });
@@ -145,7 +162,7 @@ app.post("/api/send-bulk-email", async (req, res) => {
       service: "gmail", // or use SMTP server like 'smtp.mailgun.org'
       auth: {
         user: "aslamkhan1221@gmail.com", // 🔁 Replace with your Gmail
-        pass: "Khan@123456", // 🔁 Use your Gmail app password
+        pass: "eipx qhvf tzme siqk", // 🔁 Use your Gmail app password
       },
     });
 
@@ -159,11 +176,34 @@ app.post("/api/send-bulk-email", async (req, res) => {
       });
     }
 
+    const emailCSV = recipients.join(", ");
+    const logQuery = `INSERT INTO email_logs (emails, subject, message) VALUES (?, ?, ?)`;
+
+    db.run(logQuery, [emailCSV, subject, message], function (err) {
+      if (err) console.error("❌ Failed to insert email log:", err.message);
+    });
+
     res.json({ success: true, message: "Emails sent successfully" });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Failed to send emails" });
   }
+});
+// ✅ GET - Email history
+app.get("/api/email-history", (req, res) => {
+  const query = `SELECT * FROM email_logs ORDER BY sent_at DESC`;
+
+  db.all(query, [], (err, rows) => {
+    if (err) return res.status(500).json({ error: err.message });
+
+    // Convert CSV string to array
+    const logs = rows.map((row) => ({
+      ...row,
+      emails: row.emails.split(",").map((e) => e.trim()),
+    }));
+
+    res.json(logs);
+  });
 });
 
 //  Start server

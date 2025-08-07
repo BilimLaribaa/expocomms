@@ -55,7 +55,7 @@ export default function EmailViewPage() {
   const handleSendEmail = async () => {
     setSending(true);
     try {
-      const response = await fetch('/api/send-email', {
+      const response = await fetch('http://localhost:3001/api/send-bulk-email', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -75,7 +75,9 @@ export default function EmailViewPage() {
         setSubject('');
         setMessage('');
         // Refresh logs
-        const updatedLogs = await fetch('/api/email-history').then((res) => res.json());
+        const updatedLogs = await fetch('http://localhost:3001/api/email-history').then((res) =>
+          res.json()
+        );
         setEmailLogs(updatedLogs);
       } else {
         setSnackbar({
