@@ -1,6 +1,7 @@
 import type { GridColDef } from '@mui/x-data-grid';
 
 import dayjs from 'dayjs';
+import * as XLSX from 'xlsx';
 import { useState, useEffect } from 'react';
 
 import { AlertColor } from '@mui/material/Alert';
@@ -58,6 +59,8 @@ type Contact = {
 export function ContactView() {
   const [open, setOpen] = useState(false);
   const [contacts, setContacts] = useState<Contact[]>([]);
+  const [errors, setErrors] = useState<{ [key: string]: boolean }>({});
+
   const [snackbar, setSnackbar] = useState<{
     open: boolean;
     message: string;
@@ -174,6 +177,48 @@ export function ContactView() {
     });
     setOpen(true);
   };
+  const handleImportExcel = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const inputEl = event.target;
+    const file = inputEl.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      try {
+        const data = new Uint8Array(e.target?.result as ArrayBuffer);
+        const workbook = XLSX.read(data, { type: 'array' });
+        const sheetName = workbook.SheetNames[0];
+        const sheet = workbook.Sheets[sheetName];
+        const parsedData: Contact[] = XLSX.utils.sheet_to_json(sheet, { defval: '' });
+
+        const res = await fetch('http://localhost:3001/api/contacts/import', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ contacts: parsedData }),
+        });
+
+        const result = await res.json();
+        if (!res.ok) throw new Error(result.message || 'Import failed');
+
+        const inserted = typeof result.inserted === 'number' ? result.inserted : parsedData.length;
+        const failed = typeof result.failed === 'number' ? result.failed : 0;
+        setSnackbar({
+          open: true,
+          message: `Import complete: ${inserted} added, ${failed} failed`,
+          severity: 'success',
+        });
+        fetchContacts();
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : 'Error importing contacts';
+        setSnackbar({ open: true, message: msg, severity: 'error' });
+      } finally {
+        // Allow selecting the same file again by resetting the input
+        inputEl.value = '';
+      }
+    };
+
+    reader.readAsArrayBuffer(file);
+  };
 
   const handleClose = () => setOpen(false);
 
@@ -246,10 +291,28 @@ export function ContactView() {
   };
 
   const handleSubmit = async () => {
+    // 1️⃣ Check for missing required fields before sending
+    const requiredFields: (keyof typeof formData)[] = ['full_name', 'email', 'phone', 'whatsapp'];
+
+    const newErrors: { [key: string]: boolean } = {};
+    for (const field of requiredFields) {
+      if (
+  !formData[field] || 
+  (typeof formData[field] === 'string' && formData[field].trim() === '')
+) {
+  newErrors[field] = true;
+}
+
+    }
+
+    setErrors(newErrors); // assumes you have: const [errors, setErrors] = useState<{ [key: string]: boolean }>({});
+    if (Object.keys(newErrors).length > 0) return; // stop if any required field is missing
+
+    // 2️⃣ Continue with your original code
     try {
       const method = formData.id ? 'PUT' : 'POST';
       const url = formData.id
-        ? `http://localhost:3001/api/contacts/${formData.id}`
+        ?  `http://localhost:3001/api/contacts/${formData.id}`
         : 'http://localhost:3001/api/contacts';
 
       const res = await fetch(url, {
@@ -271,6 +334,7 @@ export function ContactView() {
       setSnackbar({ open: true, message: errorMessage, severity: 'error' });
     }
   };
+
   const columns: GridColDef[] = [
     { field: 'id', headerName: 'ID', minWidth: 70, headerAlign: 'center', align: 'center' },
     {
@@ -548,9 +612,16 @@ export function ContactView() {
         Contact Menu
       </Typography>
 
-      <Button variant="contained" color="primary" onClick={handleClickOpen} sx={{ mb: 2 }}>
-        Create
-      </Button>
+      <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
+        <Button variant="contained" color="primary" onClick={handleClickOpen}>
+          Create
+        </Button>
+
+        <Button variant="outlined" component="label" color="secondary">
+          Import from Excel
+          <input type="file" accept=".xlsx, .xls" hidden onChange={handleImportExcel} />
+        </Button>
+      </Box>
 
       <Snackbar
         open={snackbar.open}
@@ -685,8 +756,17 @@ export function ContactView() {
                 name="full_name"
                 label="Full Name"
                 fullWidth
-                value={formData.full_name}
-                onChange={handleChange}
+                error={Boolean(errors.full_name)}
+                helperText={errors.full_name ? 'Full name is required' : ''}
+                onChange={(e) => {
+                  const value = e.target.value.trimStart(); // remove leading spaces
+                  setFormData({ ...formData, full_name: value });
+
+                  // ✅ clear the error immediately if valid
+                  if (value.trim() !== '' && errors.full_name) {
+                    setErrors((prev) => ({ ...prev, full_name: false }));
+                  }
+                }}
               />
             </Grid>
 
@@ -697,8 +777,18 @@ export function ContactView() {
                 label="Mobile Number"
                 type="number"
                 fullWidth
+                error={Boolean(errors.phone)}
+                helperText={errors.phone ? 'phone is required' : ''}
                 value={formData.phone}
-                onChange={handleChange}
+                onChange={(e) => {
+                  const value = e.target.value.trimStart(); // remove leading spaces
+                  setFormData({ ...formData, phone: value });
+
+                  // ✅ clear the error immediately if valid
+                  if (value.trim() !== '' && errors.phone) {
+                    setErrors((prev) => ({ ...prev, phone: false }));
+                  }
+                }}
               />
             </Grid>
             <Grid sx={{ width: '32%' }}>
@@ -719,8 +809,18 @@ export function ContactView() {
                 label="Email"
                 type="email"
                 fullWidth
+                error={Boolean(errors.email)}
+                helperText={errors.email ? 'email is required' : ''}
                 value={formData.email}
-                onChange={handleChange}
+                onChange={(e) => {
+                  const value = e.target.value.trimStart(); // remove leading spaces
+                  setFormData({ ...formData, email: value });
+
+                  // ✅ clear the error immediately if valid
+                  if (value.trim() !== '' && errors.email) {
+                    setErrors((prev) => ({ ...prev, email: false }));
+                  }
+                }}
               />
             </Grid>
             <Grid sx={{ width: '49%' }}>
@@ -910,8 +1010,17 @@ export function ContactView() {
                 name="whatsapp"
                 label="WhatsApp Number"
                 fullWidth
-                value={formData.whatsapp}
-                onChange={handleChange}
+                error={Boolean(errors.whatsapp)}
+                helperText={errors.whatsapp ? 'WhatsApp is required' : ''}
+                value={formData.whatsapp ?? ''} // ✅ default empty string if undefined/null
+                onChange={(e) => {
+                  const value = (e.target.value ?? '').toString(); // ✅ always string
+                  setFormData({ ...formData, whatsapp: value });
+
+                  if (value.trim() !== '' && errors.whatsapp) {
+                    setErrors((prev) => ({ ...prev, whatsapp: false }));
+                  }
+                }}
               />
             </Grid>
             <Grid sx={{ width: '49%' }}>
