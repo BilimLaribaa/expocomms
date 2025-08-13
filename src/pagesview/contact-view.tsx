@@ -641,16 +641,17 @@ const CustomToolbar = () => (
 
   return (
     <DashboardContent maxWidth="xl">
-      <Typography variant="h4" sx={{ mb: { xs: 3, md: 5 },display:'flex',justifyContent:"right" }}>
+      
+
+      <Box sx={{ display: 'flex', justifyContent:"space-between",gap: 0}}>
+        <Typography variant="h4" sx={{ mb: { xs: 3, md: 5 }}}>
         Contact Menu
       </Typography>
-
-      <Box sx={{ display: 'flex', justifyContent:"right",gap: 2, mb: 2 }}>
-        <Button variant="contained" color="primary" onClick={handleClickOpen}>
+        <Button variant="contained" color="primary" onClick={handleClickOpen} sx={{height:'40px',marginLeft:'530px'}}>
           Create
         </Button>
 
-        <Button variant="outlined" component="label" color="secondary">
+        <Button variant="outlined" component="label" color="secondary" sx={{height:'40px'}}>
           Import from Excel
           <input type="file" accept=".xlsx, .xls" hidden onChange={handleImportExcel} />
         </Button>
@@ -684,7 +685,7 @@ const CustomToolbar = () => (
     select
     value={filters.contact_type}
     onChange={(e) => setFilters({ ...filters, contact_type: e.target.value })}
-    sx={{ minWidth: 140 ,width:"200px"}}
+    sx={{ minWidth: 110 ,width:"200px",height:'40px'}}
   >
     <MenuItem value="">All</MenuItem>
     <MenuItem value="Business">Business</MenuItem>
