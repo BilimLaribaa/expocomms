@@ -98,6 +98,22 @@ export function ContactView() {
   const [countries, setCountries] = useState([]);
   const [states, setStates] = useState([]);
   const [cities, setCities] = useState([]);
+  const [filters, setFilters] = useState({
+  name_title: '',
+  contact_type: '',
+  state: '',
+  city: '',
+});
+
+const filteredContacts = contacts.filter(
+  (contact) =>
+    (filters.name_title === '' || contact.name_title === filters.name_title) &&
+    (filters.contact_type === '' || contact.contact_type === filters.contact_type) &&
+    (filters.state === '' || contact.state === filters.state) &&
+    (filters.city === '' || contact.city === filters.city)
+);
+
+
 
   useEffect(() => {
     fetch('https://countriesnow.space/api/v0.1/countries/positions')
@@ -363,57 +379,57 @@ export function ContactView() {
       headerAlign: 'center',
       align: 'center',
     },
-    {
-      field: 'alternate_email',
-      headerName: 'Alternate Email',
-      flex: 1,
-      minWidth: 160,
-      headerAlign: 'center',
-      align: 'center',
-    },
+    // {
+    //   field: 'alternate_email',
+    //   headerName: 'Alternate Email',
+    //   flex: 1,
+    //   minWidth: 160,
+    //   headerAlign: 'center',
+    //   align: 'center',
+    // },
     
     
-    {
-      field: 'address',
-      headerName: 'Address',
-      flex: 1,
-      minWidth: 200,
-      headerAlign: 'center',
-      align: 'center',
-    },
-    {
-      field: 'city',
-      headerName: 'City',
-      flex: 1,
-      minWidth: 120,
-      headerAlign: 'center',
-      align: 'center',
-    },
-    {
-      field: 'state',
-      headerName: 'State',
-      flex: 1,
-      minWidth: 120,
-      headerAlign: 'center',
-      align: 'center',
-    },
-    {
-      field: 'postal_code',
-      headerName: 'Postal Code',
-      flex: 1,
-      minWidth: 120,
-      headerAlign: 'center',
-      align: 'center',
-    },
-    {
-      field: 'country',
-      headerName: 'Country',
-      type: 'string',
-      flex: 1,
-      minWidth: 120,
-      headerAlign: 'center',
-      align: 'center',
-    },
+    // {
+    //   field: 'address',
+    //   headerName: 'Address',
+    //   flex: 1,
+    //   minWidth: 200,
+    //   headerAlign: 'center',
+    //   align: 'center',
+    // },
+    // {
+    //   field: 'city',
+    //   headerName: 'City',
+    //   flex: 1,
+    //   minWidth: 120,
+    //   headerAlign: 'center',
+    //   align: 'center',
+    // },
+    // {
+    //   field: 'state',
+    //   headerName: 'State',
+    //   flex: 1,
+    //   minWidth: 120,
+    //   headerAlign: 'center',
+    //   align: 'center',
+    // },
+    // {
+    //   field: 'postal_code',
+    //   headerName: 'Postal Code',
+    //   flex: 1,
+    //   minWidth: 120,
+    //   headerAlign: 'center',
+    //   align: 'center',
+    // },
+    // {
+    //   field: 'country',
+    //   headerName: 'Country',
+    //   type: 'string',
+    //   flex: 1,
+    //   minWidth: 120,
+    //   headerAlign: 'center',
+    //   align: 'center',
+    // },
     {
       field: 'contact_type',
       headerName: 'Contact Type',
@@ -422,117 +438,117 @@ export function ContactView() {
       headerAlign: 'center',
       align: 'center',
     },
-    {
-      field: 'organization_name',
-      headerName: 'Organization Name',
-      flex: 1,
-      minWidth: 150,
-      headerAlign: 'center',
-      align: 'center',
-    },
-    {
-      field: 'job_title',
-      headerName: 'Job Title',
-      flex: 1,
-      minWidth: 140,
-      headerAlign: 'center',
-      align: 'center',
-    },
-    {
-      field: 'department',
-      headerName: 'Department',
-      flex: 1,
-      minWidth: 140,
-      headerAlign: 'center',
-      align: 'center',
-    },
-    {
-      field: 'website',
-      headerName: 'Website',
-      flex: 1,
-      minWidth: 150,
-      headerAlign: 'center',
-      align: 'center',
-    },
-    {
-      field: 'linkedin',
-      headerName: 'LinkedIn Profile',
-      flex: 1,
-      minWidth: 150,
-      headerAlign: 'center',
-      align: 'center',
-    },
-    {
-      field: 'facebook',
-      headerName: 'Facebook Profile',
-      flex: 1,
-      minWidth: 150,
-      headerAlign: 'center',
-      align: 'center',
-    },
-    {
-      field: 'instagram',
-      headerName: 'Instagram Profile',
-      flex: 1,
-      minWidth: 150,
-      headerAlign: 'center',
-      align: 'center',
-    },
+    // {
+    //   field: 'organization_name',
+    //   headerName: 'Organization Name',
+    //   flex: 1,
+    //   minWidth: 150,
+    //   headerAlign: 'center',
+    //   align: 'center',
+    // },
+    // {
+    //   field: 'job_title',
+    //   headerName: 'Job Title',
+    //   flex: 1,
+    //   minWidth: 140,
+    //   headerAlign: 'center',
+    //   align: 'center',
+    // },
+    // {
+    //   field: 'department',
+    //   headerName: 'Department',
+    //   flex: 1,
+    //   minWidth: 140,
+    //   headerAlign: 'center',
+    //   align: 'center',
+    // },
+    // {
+    //   field: 'website',
+    //   headerName: 'Website',
+    //   flex: 1,
+    //   minWidth: 150,
+    //   headerAlign: 'center',
+    //   align: 'center',
+    // },
+    // {
+    //   field: 'linkedin',
+    //   headerName: 'LinkedIn Profile',
+    //   flex: 1,
+    //   minWidth: 150,
+    //   headerAlign: 'center',
+    //   align: 'center',
+    // },
+    // {
+    //   field: 'facebook',
+    //   headerName: 'Facebook Profile',
+    //   flex: 1,
+    //   minWidth: 150,
+    //   headerAlign: 'center',
+    //   align: 'center',
+    // },
+    // {
+    //   field: 'instagram',
+    //   headerName: 'Instagram Profile',
+    //   flex: 1,
+    //   minWidth: 150,
+    //   headerAlign: 'center',
+    //   align: 'center',
+    // },
     
-    {
-      field: 'relationship',
-      headerName: 'Relationship',
-      flex: 1,
-      minWidth: 120,
-      headerAlign: 'center',
-      align: 'center',
-    },
-    {
-      field: 'notes',
-      headerName: 'Notes',
-      flex: 1,
-      minWidth: 150,
-      headerAlign: 'center',
-      align: 'center',
-    },
-    {
-      field: 'is_favorite',
-      headerName: 'Is Favorite',
-      flex: 1,
-      minWidth: 100,
-      headerAlign: 'center',
-      align: 'center',
-      valueFormatter: (params: { value: boolean }) => (params.value ? 'Yes' : 'No'),
-    },
-    {
-      field: 'is_active',
-      headerName: 'Is Active',
-      flex: 1,
-      minWidth: 100,
-      headerAlign: 'center',
-      align: 'center',
-      valueFormatter: (params: { value: boolean }) => (params.value ? 'Yes' : 'No'),
-    },
-    {
-      field: 'created_at',
-      headerName: 'Created At',
-      flex: 1,
-      minWidth: 160,
-      headerAlign: 'center',
-      align: 'center',
-      valueFormatter: (params: { value: string | null }) =>
-        dayjs(params.value).format('DD MMM YYYY, h:mm A'),
-    },
-    {
-      field: 'updated_at',
-      headerName: 'Updated At',
-      flex: 1,
-      minWidth: 160,
-      headerAlign: 'center',
-      align: 'center',
-      valueFormatter: (params: { value: string | null }) =>
-        dayjs(params.value).format('DD MMM YYYY, h:mm A'),
-    },
+    // {
+    //   field: 'relationship',
+    //   headerName: 'Relationship',
+    //   flex: 1,
+    //   minWidth: 120,
+    //   headerAlign: 'center',
+    //   align: 'center',
+    // },
+    // {
+    //   field: 'notes',
+    //   headerName: 'Notes',
+    //   flex: 1,
+    //   minWidth: 150,
+    //   headerAlign: 'center',
+    //   align: 'center',
+    // },
+    // {
+    //   field: 'is_favorite',
+    //   headerName: 'Is Favorite',
+    //   flex: 1,
+    //   minWidth: 100,
+    //   headerAlign: 'center',
+    //   align: 'center',
+    //   valueFormatter: (params: { value: boolean }) => (params.value ? 'Yes' : 'No'),
+    // },
+    // {
+    //   field: 'is_active',
+    //   headerName: 'Is Active',
+    //   flex: 1,
+    //   minWidth: 100,
+    //   headerAlign: 'center',
+    //   align: 'center',
+    //   valueFormatter: (params: { value: boolean }) => (params.value ? 'Yes' : 'No'),
+    // },
+    // {
+    //   field: 'created_at',
+    //   headerName: 'Created At',
+    //   flex: 1,
+    //   minWidth: 160,
+    //   headerAlign: 'center',
+    //   align: 'center',
+    //   valueFormatter: (params: { value: string | null }) =>
+    //     dayjs(params.value).format('DD MMM YYYY, h:mm A'),
+    // },
+    // {
+    //   field: 'updated_at',
+    //   headerName: 'Updated At',
+    //   flex: 1,
+    //   minWidth: 160,
+    //   headerAlign: 'center',
+    //   align: 'center',
+    //   valueFormatter: (params: { value: string | null }) =>
+    //     dayjs(params.value).format('DD MMM YYYY, h:mm A'),
+    // },
     {
       field: 'actions',
       headerName: 'Actions',
@@ -563,6 +579,7 @@ export function ContactView() {
     },
   ];
 
+  
   return (
     <DashboardContent maxWidth="xl">
       <Typography variant="h4" sx={{ mb: { xs: 3, md: 5 } }}>
@@ -579,6 +596,77 @@ export function ContactView() {
           <input type="file" accept=".xlsx, .xls" hidden onChange={handleImportExcel} />
         </Button>
       </Box>
+      <Box display="flex" gap={2} my={2}>
+  <TextField
+    label="Title"
+    name="name_title"
+    select
+    value={filters.name_title}
+    onChange={(e) => setFilters({ ...filters, name_title: e.target.value })}
+    sx={{ minWidth: 120,width:"200px" }}
+  >
+    <MenuItem value="">All</MenuItem>
+    <MenuItem value="Mr">Mr.</MenuItem>
+    <MenuItem value="Mrs">Mrs.</MenuItem>
+    <MenuItem value="Ms">Ms.</MenuItem>
+    <MenuItem value="Miss">Miss.</MenuItem>
+    <MenuItem value="Dr">Dr.</MenuItem>
+    <MenuItem value="Er">Er.</MenuItem>
+    <MenuItem value="Adv">Adv.</MenuItem>
+    <MenuItem value="Prof">Prof.</MenuItem>
+  </TextField>
+
+  <TextField
+    label="Contact Type"
+    name="contact_type"
+    select
+    value={filters.contact_type}
+    onChange={(e) => setFilters({ ...filters, contact_type: e.target.value })}
+    sx={{ minWidth: 140 ,width:"200px"}}
+  >
+    <MenuItem value="">All</MenuItem>
+    <MenuItem value="Business">Business</MenuItem>
+    <MenuItem value="Personal">Personal</MenuItem>
+    <MenuItem value="Company">Company</MenuItem>
+    <MenuItem value="Non-Profit">Non-Profit</MenuItem>
+    <MenuItem value="School">School</MenuItem>
+    <MenuItem value="Other">Other</MenuItem>
+  </TextField>
+
+  <TextField
+    label="State"
+    name="state"
+    select
+    value={filters.state}
+    onChange={(e) => setFilters({ ...filters, state: e.target.value })}
+    sx={{ minWidth: 140,width:"200px" }}
+  >
+    <MenuItem value="">All</MenuItem>
+    {Array.from(new Set(contacts.map((c) => c.state).filter(Boolean))).map((state) => (
+      <MenuItem key={state} value={state}>
+        {state}
+      </MenuItem>
+    ))}
+  </TextField>
+
+  <TextField
+    label="City"
+    name="city"
+    select
+    value={filters.city}
+    onChange={(e) => setFilters({ ...filters, city: e.target.value })}
+    sx={{ minWidth: 140 ,width:"200px"}}
+  >
+    <MenuItem value="">All</MenuItem>
+    {Array.from(new Set(contacts.map((c) => c.city).filter(Boolean))).map((city) => (
+      <MenuItem key={city} value={city}>
+        {city}
+      </MenuItem>
+    ))}
+  </TextField>
+</Box>
+
+
 
       <Snackbar
         open={snackbar.open}
@@ -607,7 +695,7 @@ export function ContactView() {
         }}
       >
         <DataGrid
-          rows={contacts}
+          rows={filteredContacts}
           columns={columns}
           getRowId={(row) => row.id}
           columnVisibilityModel={columnVisibilityModel}

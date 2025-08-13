@@ -1,13 +1,19 @@
+
 const express = require("express");
 const sqlite3 = require("sqlite3").verbose();
 const cors = require("cors");
 const nodemailer = require("nodemailer");
+const cookieParser = require("cookie-parser"); // ✅ NEW
+const csrf = require("csurf"); // ✅ NEW
 
 const app = express();
 const PORT = 3001;
 
 app.use(cors());
 app.use(express.json({ limit: "10mb" }));
+app.use(cookieParser()); // ✅ NEW
+const csrfProtection = csrf({ cookie: true }); // ✅ NEW
+
 
 // ✅ Connect to SQLite DB
 const db = new sqlite3.Database("./contacts.db", (err) => {
@@ -24,14 +30,10 @@ const db = new sqlite3.Database("./contacts.db", (err) => {
   const createTableQuery = `
       CREATE TABLE IF NOT EXISTS contacts  (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        first_name TEXT,
-        last_name TEXT,
-        middle_name TEXT,
+        name_title TEXT,
         full_name TEXT,
         phone TEXT,
-        gender TEXT,
-        date_of_birth DATE,
-        alternate_phone TEXT,
+        alternate_email TEXT,
         address TEXT,
         city TEXT,
         state TEXT,
@@ -125,6 +127,12 @@ db.run(createEmailDeliveryLogsTable, (err) => {
   console.log("✅ 'email_delivery_logs' table ensured.");
 });
 
+// ✅ CSRF Token route (frontend fetches this)
+app.get("/api/csrf-token", csrfProtection, (req, res) => {
+  res.json({ csrfToken: req.csrfToken() });
+});
+
+
 // ✅ Add new contact
 app.post("/api/contacts", (req, res) => {
   const data = req.body;
@@ -202,14 +210,10 @@ app.post("/api/contacts/import", (req, res) => {
   }
 
   const allowedFields = [
-    "first_name",
-    "last_name",
-    "middle_name",
+    "name_title",
     "full_name",
     "phone",
-    "gender",
-    "date_of_birth",
-    "alternate_phone",
+    "alternate_email",
     "address",
     "city",
     "state",
@@ -337,9 +341,7 @@ const multer = require("multer");
 const upload = multer({ limits: { fileSize: 5 * 1024 * 1024 } }); // 5MB limit
 // ✉️ POST - Send bulk emails (with scheduling support)
 app.post(
-  "/api/send-bulk-email",
-  upload.array("attachments", 3),
-  async (req, res) => {
+  "/api/send-bulk-email", csrfProtection, upload.array("attachments", 3), async (req, res) => {
     const { subject, message, emails, scheduledTime, createCron } = req.body;
     const recipients = emails.split(",").map((e) => e.trim());
 
@@ -475,7 +477,7 @@ app.post(
   }
 );
 // ✅ GET - Email history (sent emails)
-app.get("/api/email-history", (req, res) => {
+app.get("/api/email-history", csrfProtection, (req, res) =>  {
   const query = `SELECT * FROM email_logs ORDER BY sent_at DESC`;
 
   db.all(query, [], (err, rows) => {
@@ -498,7 +500,7 @@ app.get("/api/email-history", (req, res) => {
 });
 
 // ✅ GET - Scheduled emails
-app.get("/api/scheduled-emails", (req, res) => {
+app.get("/api/scheduled-emails", csrfProtection, (req, res) =>  {
   const query = `SELECT * FROM email_jobs WHERE status = 'scheduled' ORDER BY scheduled_at ASC`;
 
   db.all(query, [], (err, rows) => {
@@ -520,7 +522,7 @@ app.get("/api/scheduled-emails", (req, res) => {
 });
 
 // ✅ Test endpoint to check database connection
-app.get("/api/test", (req, res) => {
+app.get("/api/test", csrfProtection, (req, res) =>  {
   res.json({ 
     message: "Backend is running", 
     timestamp: new Date().toISOString(),
@@ -529,7 +531,7 @@ app.get("/api/test", (req, res) => {
 });
 
 // ✅ GET - Email delivery status for a specific email log
-app.get("/api/email-delivery-status/:emailLogId", (req, res) => {
+app.get("/api/email-delivery-status/:emailLogId", csrfProtection, (req, res) =>  {
   const { emailLogId } = req.params;
   
   const query = `
@@ -555,7 +557,7 @@ app.get("/api/email-delivery-status/:emailLogId", (req, res) => {
 });
 
 // ✅ Tracking pixel to mark delivered when email is opened
-app.get('/api/track/:deliveryLogId', (req, res) => {
+app.get('/api/track/:deliveryLogId', csrfProtection, (req, res) => {
   const { deliveryLogId } = req.params;
   db.run(
     `UPDATE email_delivery_logs SET status = 'delivered', delivered_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP WHERE id = ? AND status != 'failed'`,
@@ -582,7 +584,7 @@ app.get('/api/track/:deliveryLogId', (req, res) => {
 });
 
 // ✅ GET - Email delivery statistics
-app.get("/api/email-delivery-stats", (req, res) => {
+app.get("/api/email-delivery-stats", csrfProtection, (req, res) =>  {
   const query = `
     SELECT 
       status,
@@ -603,7 +605,7 @@ app.get("/api/email-delivery-stats", (req, res) => {
 });
 
 // ✅ PUT - Update delivery status (for manual status updates)
-app.put("/api/email-delivery-status/:id", (req, res) => {
+app.put("/api/email-delivery-status/:id", csrfProtection, (req, res) =>  {
   const { id } = req.params;
   const { status, error_message } = req.body;
   
@@ -647,7 +649,7 @@ app.put("/api/email-delivery-status/:id", (req, res) => {
 });
 
 // ✅ DELETE - Cancel scheduled email
-app.delete("/api/scheduled-emails/:id", (req, res) => {
+app.delete("/api/scheduled-emails/:id", csrfProtection, (req, res) => {
   const { id } = req.params;
   
   db.run(
