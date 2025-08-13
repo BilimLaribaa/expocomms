@@ -348,14 +348,7 @@ const filteredContacts = contacts.filter(
 
   const columns: GridColDef[] = [
     { field: 'id', headerName: 'ID', minWidth: 70, headerAlign: 'center', align: 'center' },
-    {
-      field: 'name_title',
-      headerName: 'Name Title',
-      flex: 1,
-      minWidth: 140,
-      headerAlign: 'center',
-      align: 'center',
-    },
+    
     
     {
       field: 'full_name',
@@ -364,6 +357,7 @@ const filteredContacts = contacts.filter(
       minWidth: 140,
       headerAlign: 'center',
       align: 'center',
+      valueGetter:(params, data) => data.name_title+". "+data.full_name,
     },
     {
       field: 'phone',
@@ -390,57 +384,57 @@ const filteredContacts = contacts.filter(
       headerAlign: 'center',
       align: 'center',
     },
-    // {
-    //   field: 'alternate_email',
-    //   headerName: 'Alternate Email',
-    //   flex: 1,
-    //   minWidth: 160,
-    //   headerAlign: 'center',
-    //   align: 'center',
-    // },
+    {
+      field: 'alternate_email',
+      headerName: 'Alternate Email',
+      flex: 1,
+      minWidth: 160,
+      headerAlign: 'center',
+      align: 'center',
+    },
     
     
-    // {
-    //   field: 'address',
-    //   headerName: 'Address',
-    //   flex: 1,
-    //   minWidth: 200,
-    //   headerAlign: 'center',
-    //   align: 'center',
-    // },
-    // {
-    //   field: 'city',
-    //   headerName: 'City',
-    //   flex: 1,
-    //   minWidth: 120,
-    //   headerAlign: 'center',
-    //   align: 'center',
-    // },
-    // {
-    //   field: 'state',
-    //   headerName: 'State',
-    //   flex: 1,
-    //   minWidth: 120,
-    //   headerAlign: 'center',
-    //   align: 'center',
-    // },
-    // {
-    //   field: 'postal_code',
-    //   headerName: 'Postal Code',
-    //   flex: 1,
-    //   minWidth: 120,
-    //   headerAlign: 'center',
-    //   align: 'center',
-    // },
-    // {
-    //   field: 'country',
-    //   headerName: 'Country',
-    //   type: 'string',
-    //   flex: 1,
-    //   minWidth: 120,
-    //   headerAlign: 'center',
-    //   align: 'center',
-    // },
+    {
+      field: 'address',
+      headerName: 'Address',
+      flex: 1,
+      minWidth: 200,
+      headerAlign: 'center',
+      align: 'center',
+    },
+    {
+      field: 'city',
+      headerName: 'City',
+      flex: 1,
+      minWidth: 120,
+      headerAlign: 'center',
+      align: 'center',
+    },
+    {
+      field: 'state',
+      headerName: 'State',
+      flex: 1,
+      minWidth: 120,
+      headerAlign: 'center',
+      align: 'center',
+    },
+    {
+      field: 'postal_code',
+      headerName: 'Postal Code',
+      flex: 1,
+      minWidth: 120,
+      headerAlign: 'center',
+      align: 'center',
+    },
+    {
+      field: 'country',
+      headerName: 'Country',
+      type: 'string',
+      flex: 1,
+      minWidth: 120,
+      headerAlign: 'center',
+      align: 'center',
+    },
     {
       field: 'contact_type',
       headerName: 'Contact Type',
@@ -449,117 +443,117 @@ const filteredContacts = contacts.filter(
       headerAlign: 'center',
       align: 'center',
     },
-    // {
-    //   field: 'organization_name',
-    //   headerName: 'Organization Name',
-    //   flex: 1,
-    //   minWidth: 150,
-    //   headerAlign: 'center',
-    //   align: 'center',
-    // },
-    // {
-    //   field: 'job_title',
-    //   headerName: 'Job Title',
-    //   flex: 1,
-    //   minWidth: 140,
-    //   headerAlign: 'center',
-    //   align: 'center',
-    // },
-    // {
-    //   field: 'department',
-    //   headerName: 'Department',
-    //   flex: 1,
-    //   minWidth: 140,
-    //   headerAlign: 'center',
-    //   align: 'center',
-    // },
-    // {
-    //   field: 'website',
-    //   headerName: 'Website',
-    //   flex: 1,
-    //   minWidth: 150,
-    //   headerAlign: 'center',
-    //   align: 'center',
-    // },
-    // {
-    //   field: 'linkedin',
-    //   headerName: 'LinkedIn Profile',
-    //   flex: 1,
-    //   minWidth: 150,
-    //   headerAlign: 'center',
-    //   align: 'center',
-    // },
-    // {
-    //   field: 'facebook',
-    //   headerName: 'Facebook Profile',
-    //   flex: 1,
-    //   minWidth: 150,
-    //   headerAlign: 'center',
-    //   align: 'center',
-    // },
-    // {
-    //   field: 'instagram',
-    //   headerName: 'Instagram Profile',
-    //   flex: 1,
-    //   minWidth: 150,
-    //   headerAlign: 'center',
-    //   align: 'center',
-    // },
+    {
+      field: 'organization_name',
+      headerName: 'Organization Name',
+      flex: 1,
+      minWidth: 150,
+      headerAlign: 'center',
+      align: 'center',
+    },
+    {
+      field: 'job_title',
+      headerName: 'Job Title',
+      flex: 1,
+      minWidth: 140,
+      headerAlign: 'center',
+      align: 'center',
+    },
+    {
+      field: 'department',
+      headerName: 'Department',
+      flex: 1,
+      minWidth: 140,
+      headerAlign: 'center',
+      align: 'center',
+    },
+    {
+      field: 'website',
+      headerName: 'Website',
+      flex: 1,
+      minWidth: 150,
+      headerAlign: 'center',
+      align: 'center',
+    },
+    {
+      field: 'linkedin',
+      headerName: 'LinkedIn Profile',
+      flex: 1,
+      minWidth: 150,
+      headerAlign: 'center',
+      align: 'center',
+    },
+    {
+      field: 'facebook',
+      headerName: 'Facebook Profile',
+      flex: 1,
+      minWidth: 150,
+      headerAlign: 'center',
+      align: 'center',
+    },
+    {
+      field: 'instagram',
+      headerName: 'Instagram Profile',
+      flex: 1,
+      minWidth: 150,
+      headerAlign: 'center',
+      align: 'center',
+    },
     
-    // {
-    //   field: 'relationship',
-    //   headerName: 'Relationship',
-    //   flex: 1,
-    //   minWidth: 120,
-    //   headerAlign: 'center',
-    //   align: 'center',
-    // },
-    // {
-    //   field: 'notes',
-    //   headerName: 'Notes',
-    //   flex: 1,
-    //   minWidth: 150,
-    //   headerAlign: 'center',
-    //   align: 'center',
-    // },
-    // {
-    //   field: 'is_favorite',
-    //   headerName: 'Is Favorite',
-    //   flex: 1,
-    //   minWidth: 100,
-    //   headerAlign: 'center',
-    //   align: 'center',
-    //   valueFormatter: (params: { value: boolean }) => (params.value ? 'Yes' : 'No'),
-    // },
-    // {
-    //   field: 'is_active',
-    //   headerName: 'Is Active',
-    //   flex: 1,
-    //   minWidth: 100,
-    //   headerAlign: 'center',
-    //   align: 'center',
-    //   valueFormatter: (params: { value: boolean }) => (params.value ? 'Yes' : 'No'),
-    // },
-    // {
-    //   field: 'created_at',
-    //   headerName: 'Created At',
-    //   flex: 1,
-    //   minWidth: 160,
-    //   headerAlign: 'center',
-    //   align: 'center',
-    //   valueFormatter: (params: { value: string | null }) =>
-    //     dayjs(params.value).format('DD MMM YYYY, h:mm A'),
-    // },
-    // {
-    //   field: 'updated_at',
-    //   headerName: 'Updated At',
-    //   flex: 1,
-    //   minWidth: 160,
-    //   headerAlign: 'center',
-    //   align: 'center',
-    //   valueFormatter: (params: { value: string | null }) =>
-    //     dayjs(params.value).format('DD MMM YYYY, h:mm A'),
-    // },
+    {
+      field: 'relationship',
+      headerName: 'Relationship',
+      flex: 1,
+      minWidth: 120,
+      headerAlign: 'center',
+      align: 'center',
+    },
+    {
+      field: 'notes',
+      headerName: 'Notes',
+      flex: 1,
+      minWidth: 150,
+      headerAlign: 'center',
+      align: 'center',
+    },
+    {
+      field: 'is_favorite',
+      headerName: 'Is Favorite',
+      flex: 1,
+      minWidth: 100,
+      headerAlign: 'center',
+      align: 'center',
+      valueFormatter: (params: { value: boolean }) => (params.value ? 'Yes' : 'No'),
+    },
+    {
+      field: 'is_active',
+      headerName: 'Is Active',
+      flex: 1,
+      minWidth: 100,
+      headerAlign: 'center',
+      align: 'center',
+      valueFormatter: (params: { value: boolean }) => (params.value ? 'Yes' : 'No'),
+    },
+    {
+      field: 'created_at',
+      headerName: 'Created At',
+      flex: 1,
+      minWidth: 160,
+      headerAlign: 'center',
+      align: 'center',
+      valueFormatter: (params: { value: string | null }) =>
+        dayjs(params.value).format('DD MMM YYYY, h:mm A'),
+    },
+    {
+      field: 'updated_at',
+      headerName: 'Updated At',
+      flex: 1,
+      minWidth: 160,
+      headerAlign: 'center',
+      align: 'center',
+      valueFormatter: (params: { value: string | null }) =>
+        dayjs(params.value).format('DD MMM YYYY, h:mm A'),
+    },
     {
       field: 'actions',
       headerName: 'Actions',
@@ -666,7 +660,7 @@ const CustomToolbar = () => (
     select
     value={filters.name_title}
     onChange={(e) => setFilters({ ...filters, name_title: e.target.value })}
-    sx={{ minWidth: 120,width:"200px" }}
+    sx={{ minWidth: 120,width:"220px" }}
   >
     <MenuItem value="">All</MenuItem>
     <MenuItem value="Mr">Mr.</MenuItem>
@@ -685,7 +679,7 @@ const CustomToolbar = () => (
     select
     value={filters.contact_type}
     onChange={(e) => setFilters({ ...filters, contact_type: e.target.value })}
-    sx={{ minWidth: 110 ,width:"200px",height:'40px'}}
+    sx={{ minWidth: 140 ,width:"223px"}}
   >
     <MenuItem value="">All</MenuItem>
     <MenuItem value="Business">Business</MenuItem>
@@ -702,7 +696,7 @@ const CustomToolbar = () => (
     select
     value={filters.state}
     onChange={(e) => setFilters({ ...filters, state: e.target.value })}
-    sx={{ minWidth: 140,width:"200px" }}
+    sx={{ minWidth: 140,width:"223px" }}
   >
     <MenuItem value="">All</MenuItem>
     {Array.from(new Set(contacts.map((c) => c.state).filter(Boolean))).map((state) => (
@@ -718,7 +712,7 @@ const CustomToolbar = () => (
     select
     value={filters.city}
     onChange={(e) => setFilters({ ...filters, city: e.target.value })}
-    sx={{ minWidth: 140 ,width:"200px"}}
+    sx={{ minWidth: 140 ,width:"223px"}}
   >
     <MenuItem value="">All</MenuItem>
     {Array.from(new Set(contacts.map((c) => c.city).filter(Boolean))).map((city) => (
@@ -761,12 +755,47 @@ const CustomToolbar = () => (
           rows={filteredContacts}
           columns={columns}
           getRowId={(row) => row.id}
-          columnVisibilityModel={columnVisibilityModel}
           onColumnVisibilityModelChange={(model) => setColumnVisibilityModel(model)}
           checkboxSelection
           disableColumnMenu
           disableRowSelectionOnClick
 slots={{ toolbar: CustomToolbar }}
+ disableColumnFilter={false}
+  disableColumnSelector={false} // ✅ show column menu
+  initialState={{
+    columns: {
+      columnVisibilityModel: {
+        id: true,
+        full_name: true,
+        phone: true,
+        email: true,
+        actions: true,
+
+         // hide all others by default
+        whatsapp: false,
+        alternate_email: false,
+        address: false,
+        city: false,
+        state: false,
+        postal_code: false,
+        country: false,
+        contact_type: false,
+        organization_name: false,
+        job_title: false,
+        department: false,
+        website: false,
+        linkedin: false,
+        facebook: false,
+        instagram: false,
+        relationship: false,
+        notes: false,
+        is_favorite: false,
+        is_active: false,
+        created_at: false,
+        updated_at: false,
+         },
+    },
+  }}
 
           sx={{
             border: 'none',
