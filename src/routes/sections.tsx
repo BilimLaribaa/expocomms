@@ -13,6 +13,7 @@ import { DashboardLayout } from 'src/layouts/dashboard';
 
 export const DashboardPage = lazy(() => import('src/pages/dashboard'));
 export const ContactsPage = lazy(() => import('src/pages/contacts'));
+export const EmailViewPage = lazy(() => import('src/pages/email'));
 
 const renderFallback = () => (
   <Box
@@ -47,6 +48,7 @@ export const routesSection: RouteObject[] = [
       { index: true, element: <DashboardPage /> },
 
       { path: 'contacts', element: <ContactsPage /> },
+      { path: 'email', element: <EmailViewPage /> },
     ],
   },
 ];

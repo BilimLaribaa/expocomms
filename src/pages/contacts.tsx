@@ -1,6 +1,5 @@
 import { CONFIG } from 'src/config-global';
-
-import { ContactView } from 'src/sections/overview/view/contact-view';
+import { ContactView } from 'src/pagesview/contact-view';
 
 // ----------------------------------------------------------------------
 

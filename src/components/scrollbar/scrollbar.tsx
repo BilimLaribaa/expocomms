@@ -135,8 +135,8 @@ export function Scrollbar({
   return (
     <ScrollbarRoot
       // ref={scrollbarRef}
-      scrollableNodeProps={{ ref }}
-      clickOnTrack={false}
+      // scrollableNodeProps={{ ref }}
+      // clickOnTrack={false}
       fillContent={fillContent}
       className={mergeClasses([scrollbarClasses.root, className])}
       sx={[
