@@ -261,6 +261,8 @@ export default function EmailViewPage() {
 
     setSending(true);
     try {
+      const sendEmail = async () => {
+  const csrfToken = await getCsrfToken(); // ✅ Await the token
       const formData = new FormData();
       // If you allow passing arrays of emails from the UI, you can also send as CSV.
       formData.append('emails', emails);
@@ -278,9 +280,14 @@ export default function EmailViewPage() {
       attachments.forEach((file) => formData.append('attachments', file));
 
       const res = await fetch('http://localhost:3001/api/send-bulk-email', {
-        method: 'POST',
-        body: formData,
-      });
+         method: "POST",
+    body: formData,
+    credentials: 'include', // ✅ Send cookies
+    headers: {
+      "X-CSRF-Token": csrfToken // ✅ Required
+    },
+  });
+  
 
       const result = await res.json();
 
@@ -304,6 +311,9 @@ export default function EmailViewPage() {
       } else {
         setSnackbar({ open: true, message: result.error || 'Failed to send', severity: 'error' });
       }
+    };
+          await sendEmail(); // ✅ You must call the function here
+
     } catch (err) {
       console.error(err);
       setSnackbar({ open: true, message: 'Server error', severity: 'error' });
@@ -354,6 +364,16 @@ export default function EmailViewPage() {
     setMessage(parsed.message || '');
     setSnackbar({ open: true, message: 'Draft loaded.', severity: 'success' });
   };
+
+  // CSRF token fetch (e.g., React frontend)
+const getCsrfToken = async () => {
+  const res = await fetch('http://localhost:3001/api/csrf-token', {
+    credentials: 'include' // ✅ Sends the cookie
+  });
+  const data = await res.json();
+  return data.csrfToken;
+};
+
 
   const cancelScheduledEmail = async (id: number) => {
     try {
@@ -569,7 +589,7 @@ export default function EmailViewPage() {
                           fontWeight: 600
                         }}
                       >
-                        {contact.first_name.charAt(0).toUpperCase()}
+                        {contact.first_name?.charAt(0).toUpperCase() || ''}
                       </Avatar>
                     </ListItemAvatar>
                     <ListItemText

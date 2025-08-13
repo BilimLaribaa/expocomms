@@ -2,10 +2,17 @@ import type { GridColDef } from '@mui/x-data-grid';
 
 import dayjs from 'dayjs';
 import * as XLSX from 'xlsx';
+import { saveAs } from 'file-saver';
 import { useState, useEffect } from 'react';
 
 import { AlertColor } from '@mui/material/Alert';
 import { DataGrid, GridToolbar } from '@mui/x-data-grid';
+import {
+  GridToolbarContainer,
+  GridToolbarExport,
+  GridToolbarColumnsButton,
+  GridToolbarDensitySelector,
+} from '@mui/x-data-grid';
 import {
   Alert as MuiAlert,
   Box,
@@ -50,6 +57,10 @@ type Contact = {
   is_active: boolean;
   created_at: string;
   updated_at: string;
+}
+  & {
+  [key: string]: any;
+
 };
 
 export function ContactView() {
@@ -231,7 +242,7 @@ const filteredContacts = contacts.filter(
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const [columnVisibilityModel, setColumnVisibilityModel] = useState({});
+  const [columnVisibilityModel, setColumnVisibilityModel] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     fetchContacts();
@@ -579,14 +590,62 @@ const filteredContacts = contacts.filter(
     },
   ];
 
-  
+// Assuming `filteredContacts`, `columns`, and `columnVisibilityModel` are in scope
+const exportToExcel = () => {
+  // Step 1: Get the list of visible column fields
+  const visibleColumnFields = columns
+    .filter((col) => columnVisibilityModel[col.field] !== false)
+    .map((col) => col.field);
+
+  // Step 2: Build a new dataset with only visible fields
+  const filteredData = filteredContacts.map((contact) => {
+    const row: Record<string, any> = {};
+    visibleColumnFields.forEach((field) => {
+      row[field] = (contact as Record<string, any>)[field];
+    });
+    return row;
+  });
+
+  // Step 3: Create Excel file
+  const worksheet = XLSX.utils.json_to_sheet(filteredData);
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, 'Contacts');
+
+  const excelBuffer = XLSX.write(workbook, {
+    bookType: 'xlsx',
+    type: 'array',
+  });
+
+  const blob = new Blob([excelBuffer], {
+    type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+  });
+
+  saveAs(blob, 'contacts_export.xlsx');
+};  
+
+const CustomToolbar = () => (
+  <GridToolbarContainer>
+    <GridToolbarColumnsButton />
+    <GridToolbarDensitySelector />
+    <GridToolbarExport />
+    <Button
+      onClick={exportToExcel}
+      variant="outlined"
+      size="small"
+      sx={{ ml: 1 }}
+    >
+      Export Excel
+    </Button>
+  </GridToolbarContainer>
+);
+
   return (
     <DashboardContent maxWidth="xl">
-      <Typography variant="h4" sx={{ mb: { xs: 3, md: 5 } }}>
+      <Typography variant="h4" sx={{ mb: { xs: 3, md: 5 },display:'flex',justifyContent:"right" }}>
         Contact Menu
       </Typography>
 
-      <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
+      <Box sx={{ display: 'flex', justifyContent:"right",gap: 2, mb: 2 }}>
         <Button variant="contained" color="primary" onClick={handleClickOpen}>
           Create
         </Button>
@@ -595,6 +654,9 @@ const filteredContacts = contacts.filter(
           Import from Excel
           <input type="file" accept=".xlsx, .xls" hidden onChange={handleImportExcel} />
         </Button>
+       
+
+
       </Box>
       <Box display="flex" gap={2} my={2}>
   <TextField
@@ -703,7 +765,8 @@ const filteredContacts = contacts.filter(
           checkboxSelection
           disableColumnMenu
           disableRowSelectionOnClick
-          slots={{ toolbar: GridToolbar }}
+slots={{ toolbar: CustomToolbar }}
+
           sx={{
             border: 'none',
 
