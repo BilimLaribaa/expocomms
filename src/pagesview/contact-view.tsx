@@ -25,15 +25,11 @@ import { DashboardContent } from 'src/layouts/dashboard';
 
 type Contact = {
   id: number | null;
-  first_name: string;
-  middle_name: string;
-  last_name: string;
+  name_title: string;
   full_name: string;
   phone: string;
-  alternate_phone: string;
+  alternate_email: string;
   email: string;
-  gender: string;
-  date_of_birth: string;
   address: string;
   city: string;
   state: string;
@@ -73,15 +69,11 @@ export function ContactView() {
   const [formData, setFormData] = useState<Contact>({
     id: null,
     full_name: '',
-    first_name: '',
+    name_title: '',
     email: '',
     phone: '',
     whatsapp: '',
-    middle_name: '',
-    last_name: '',
-    alternate_phone: '',
-    gender: '',
-    date_of_birth: '',
+    alternate_email: '',
     address: '',
     city: '',
     state: '',
@@ -146,15 +138,11 @@ export function ContactView() {
     setFormData({
       id: null,
       full_name: '',
-      first_name: '',
+      name_title:'',
+      alternate_email:'',
       email: '',
       phone: '',
       whatsapp: '',
-      middle_name: '',
-      last_name: '',
-      alternate_phone: '',
-      gender: '',
-      date_of_birth: '',
       address: '',
       city: '',
       state: '',
@@ -245,15 +233,11 @@ export function ContactView() {
       contact || {
         id: null,
         full_name: '',
-        first_name: '',
+        name_title: '',
         email: '',
         phone: '',
         whatsapp: '',
-        middle_name: '',
-        last_name: '',
-        alternate_phone: '',
-        gender: '',
-        date_of_birth: '',
+        alternate_email: '',
         address: '',
         city: '',
         state: '',
@@ -703,6 +687,8 @@ export function ContactView() {
                 label="Title"
                 fullWidth
                 select
+                value={formData.name_title}
+                onChange={handleChange}
                
               >
                 <MenuItem value="Mr">Mr.</MenuItem>
@@ -814,8 +800,9 @@ export function ContactView() {
                 margin="dense"
                 name="alternate_email"
                 label="Alternate Email"
-                type="number"
+                type="text"
                 fullWidth
+                 value={formData.alternate_email}
                 onChange={handleChange}
               />
             </Grid>
