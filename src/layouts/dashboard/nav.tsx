@@ -15,7 +15,9 @@ import { RouterLink } from 'src/routes/components';
 import { Logo } from 'src/components/logo';
 import { Scrollbar } from 'src/components/scrollbar';
 
+// import { WorkspacesPopover } from '../components/workspaces-popover';
 import type { NavItem } from '../nav-config-dashboard';
+// import type { WorkspacesPopoverProps } from '../components/workspaces-popover';
 
 // ----------------------------------------------------------------------
 
@@ -25,6 +27,7 @@ export type NavContentProps = {
     topArea?: React.ReactNode;
     bottomArea?: React.ReactNode;
   };
+  // workspaces: WorkspacesPopoverProps['data'];
   sx?: SxProps<Theme>;
 };
 
@@ -32,6 +35,7 @@ export function NavDesktop({
   sx,
   data,
   slots,
+  // workspaces,
   layoutQuery,
 }: NavContentProps & { layoutQuery: Breakpoint }) {
   const theme = useTheme();
@@ -56,7 +60,7 @@ export function NavDesktop({
         ...sx,
       }}
     >
-      <NavContent data={data} slots={slots}  />
+      <NavContent data={data} slots={slots} />
     </Box>
   );
 }
@@ -69,6 +73,7 @@ export function NavMobile({
   open,
   slots,
   onClose,
+  // workspaces,
 }: NavContentProps & { open: boolean; onClose: () => void }) {
   const pathname = usePathname();
 
@@ -109,6 +114,7 @@ export function NavContent({ data, slots, sx }: NavContentProps) {
 
       {slots?.topArea}
 
+      {/* <WorkspacesPopover data={workspaces} sx={{ my: 2 }} /> */}
 
       <Scrollbar fillContent>
         <Box

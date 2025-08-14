@@ -2,10 +2,17 @@ import type { GridColDef } from '@mui/x-data-grid';
 
 import dayjs from 'dayjs';
 import * as XLSX from 'xlsx';
+import { saveAs } from 'file-saver';
 import { useState, useEffect } from 'react';
 
 import { AlertColor } from '@mui/material/Alert';
 import { DataGrid, GridToolbar } from '@mui/x-data-grid';
+import {
+  GridToolbarContainer,
+  GridToolbarExport,
+  GridToolbarColumnsButton,
+  GridToolbarDensitySelector,
+} from '@mui/x-data-grid';
 import {
   Alert as MuiAlert,
   Box,
@@ -25,15 +32,11 @@ import { DashboardContent } from 'src/layouts/dashboard';
 
 type Contact = {
   id: number | null;
-  first_name: string;
-  middle_name: string;
-  last_name: string;
+  name_title: string;
   full_name: string;
   phone: string;
-  alternate_phone: string;
+  alternate_email: string;
   email: string;
-  gender: string;
-  date_of_birth: string;
   address: string;
   city: string;
   state: string;
@@ -54,6 +57,10 @@ type Contact = {
   is_active: boolean;
   created_at: string;
   updated_at: string;
+}
+  & {
+  [key: string]: any;
+
 };
 
 export function ContactView() {
@@ -73,15 +80,11 @@ export function ContactView() {
   const [formData, setFormData] = useState<Contact>({
     id: null,
     full_name: '',
-    first_name: '',
+    name_title: '',
     email: '',
     phone: '',
     whatsapp: '',
-    middle_name: '',
-    last_name: '',
-    alternate_phone: '',
-    gender: '',
-    date_of_birth: '',
+    alternate_email: '',
     address: '',
     city: '',
     state: '',
@@ -106,6 +109,22 @@ export function ContactView() {
   const [countries, setCountries] = useState([]);
   const [states, setStates] = useState([]);
   const [cities, setCities] = useState([]);
+  const [filters, setFilters] = useState({
+  name_title: '',
+  contact_type: '',
+  state: '',
+  city: '',
+});
+
+const filteredContacts = contacts.filter(
+  (contact) =>
+    (filters.name_title === '' || contact.name_title === filters.name_title) &&
+    (filters.contact_type === '' || contact.contact_type === filters.contact_type) &&
+    (filters.state === '' || contact.state === filters.state) &&
+    (filters.city === '' || contact.city === filters.city)
+);
+
+
 
   useEffect(() => {
     fetch('https://countriesnow.space/api/v0.1/countries/positions')
@@ -146,15 +165,11 @@ export function ContactView() {
     setFormData({
       id: null,
       full_name: '',
-      first_name: '',
+      name_title:'',
+      alternate_email:'',
       email: '',
       phone: '',
       whatsapp: '',
-      middle_name: '',
-      last_name: '',
-      alternate_phone: '',
-      gender: '',
-      date_of_birth: '',
       address: '',
       city: '',
       state: '',
@@ -227,7 +242,7 @@ export function ContactView() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const [columnVisibilityModel, setColumnVisibilityModel] = useState({});
+  const [columnVisibilityModel, setColumnVisibilityModel] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     fetchContacts();
@@ -245,15 +260,11 @@ export function ContactView() {
       contact || {
         id: null,
         full_name: '',
-        first_name: '',
+        name_title: '',
         email: '',
         phone: '',
         whatsapp: '',
-        middle_name: '',
-        last_name: '',
-        alternate_phone: '',
-        gender: '',
-        date_of_birth: '',
+        alternate_email: '',
         address: '',
         city: '',
         state: '',
@@ -337,30 +348,8 @@ export function ContactView() {
 
   const columns: GridColDef[] = [
     { field: 'id', headerName: 'ID', minWidth: 70, headerAlign: 'center', align: 'center' },
-    {
-      field: 'first_name',
-      headerName: 'First Name',
-      flex: 1,
-      minWidth: 120,
-      headerAlign: 'center',
-      align: 'center',
-    },
-    {
-      field: 'middle_name',
-      headerName: 'Middle Name',
-      flex: 1,
-      minWidth: 120,
-      headerAlign: 'center',
-      align: 'center',
-    },
-    {
-      field: 'last_name',
-      headerName: 'Last Name',
-      flex: 1,
-      minWidth: 120,
-      headerAlign: 'center',
-      align: 'center',
-    },
+    
+    
     {
       field: 'full_name',
       headerName: 'Full Name',
@@ -368,6 +357,7 @@ export function ContactView() {
       minWidth: 140,
       headerAlign: 'center',
       align: 'center',
+      valueGetter:(params, data) => data.name_title+". "+data.full_name,
     },
     {
       field: 'phone',
@@ -378,13 +368,14 @@ export function ContactView() {
       align: 'center',
     },
     {
-      field: 'alternate_phone',
-      headerName: 'Alternate Mobile Number',
+      field: 'whatsapp',
+      headerName: 'WhatsApp Number',
       flex: 1,
-      minWidth: 160,
+      minWidth: 150,
       headerAlign: 'center',
       align: 'center',
     },
+    
     {
       field: 'email',
       headerName: 'Email',
@@ -394,21 +385,15 @@ export function ContactView() {
       align: 'center',
     },
     {
-      field: 'gender',
-      headerName: 'Gender',
+      field: 'alternate_email',
+      headerName: 'Alternate Email',
       flex: 1,
-      minWidth: 100,
+      minWidth: 160,
       headerAlign: 'center',
       align: 'center',
     },
-    {
-      field: 'date_of_birth',
-      headerName: 'Date of Birth',
-      flex: 1,
-      minWidth: 120,
-      headerAlign: 'center',
-      align: 'center',
-    },
+    
+    
     {
       field: 'address',
       headerName: 'Address',
@@ -514,14 +499,7 @@ export function ContactView() {
       headerAlign: 'center',
       align: 'center',
     },
-    {
-      field: 'whatsapp',
-      headerName: 'WhatsApp Number',
-      flex: 1,
-      minWidth: 150,
-      headerAlign: 'center',
-      align: 'center',
-    },
+    
     {
       field: 'relationship',
       headerName: 'Relationship',
@@ -606,22 +584,146 @@ export function ContactView() {
     },
   ];
 
+// Assuming `filteredContacts`, `columns`, and `columnVisibilityModel` are in scope
+const exportToExcel = () => {
+  // Step 1: Get the list of visible column fields
+  const visibleColumnFields = columns
+    .filter((col) => columnVisibilityModel[col.field] !== false)
+    .map((col) => col.field);
+
+  // Step 2: Build a new dataset with only visible fields
+  const filteredData = filteredContacts.map((contact) => {
+    const row: Record<string, any> = {};
+    visibleColumnFields.forEach((field) => {
+      row[field] = (contact as Record<string, any>)[field];
+    });
+    return row;
+  });
+
+  // Step 3: Create Excel file
+  const worksheet = XLSX.utils.json_to_sheet(filteredData);
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, 'Contacts');
+
+  const excelBuffer = XLSX.write(workbook, {
+    bookType: 'xlsx',
+    type: 'array',
+  });
+
+  const blob = new Blob([excelBuffer], {
+    type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+  });
+
+  saveAs(blob, 'contacts_export.xlsx');
+};  
+
+const CustomToolbar = () => (
+  <GridToolbarContainer>
+    <GridToolbarColumnsButton />
+    <GridToolbarDensitySelector />
+    <GridToolbarExport />
+    <Button
+      onClick={exportToExcel}
+      variant="outlined"
+      size="small"
+      sx={{ ml: 1 }}
+    >
+      Export Excel
+    </Button>
+  </GridToolbarContainer>
+);
+
   return (
     <DashboardContent maxWidth="xl">
-      <Typography variant="h4" sx={{ mb: { xs: 3, md: 5 } }}>
+      
+
+      <Box sx={{ display: 'flex', justifyContent:"space-between",gap: 0}}>
+        <Typography variant="h4" sx={{ mb: { xs: 3, md: 5 }}}>
         Contact Menu
       </Typography>
-
-      <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
-        <Button variant="contained" color="primary" onClick={handleClickOpen}>
+        <Button variant="contained" color="primary" onClick={handleClickOpen} sx={{height:'40px',marginLeft:'530px'}}>
           Create
         </Button>
 
-        <Button variant="outlined" component="label" color="secondary">
+        <Button variant="outlined" component="label" color="secondary" sx={{height:'40px'}}>
           Import from Excel
           <input type="file" accept=".xlsx, .xls" hidden onChange={handleImportExcel} />
         </Button>
+       
+
+
       </Box>
+      <Box display="flex" gap={2} my={2}>
+  <TextField
+    label="Title"
+    name="name_title"
+    select
+    value={filters.name_title}
+    onChange={(e) => setFilters({ ...filters, name_title: e.target.value })}
+    sx={{ minWidth: 120,width:"220px" }}
+  >
+    <MenuItem value="">All</MenuItem>
+    <MenuItem value="Mr">Mr.</MenuItem>
+    <MenuItem value="Mrs">Mrs.</MenuItem>
+    <MenuItem value="Ms">Ms.</MenuItem>
+    <MenuItem value="Miss">Miss.</MenuItem>
+    <MenuItem value="Dr">Dr.</MenuItem>
+    <MenuItem value="Er">Er.</MenuItem>
+    <MenuItem value="Adv">Adv.</MenuItem>
+    <MenuItem value="Prof">Prof.</MenuItem>
+  </TextField>
+
+  <TextField
+    label="Contact Type"
+    name="contact_type"
+    select
+    value={filters.contact_type}
+    onChange={(e) => setFilters({ ...filters, contact_type: e.target.value })}
+    sx={{ minWidth: 140 ,width:"223px"}}
+  >
+    <MenuItem value="">All</MenuItem>
+    <MenuItem value="Business">Business</MenuItem>
+    <MenuItem value="Personal">Personal</MenuItem>
+    <MenuItem value="Company">Company</MenuItem>
+    <MenuItem value="Non-Profit">Non-Profit</MenuItem>
+    <MenuItem value="School">School</MenuItem>
+    <MenuItem value="Other">Other</MenuItem>
+  </TextField>
+
+  <TextField
+    label="State"
+    name="state"
+    select
+    value={filters.state}
+    onChange={(e) => setFilters({ ...filters, state: e.target.value })}
+    sx={{ minWidth: 140,width:"223px" }}
+  >
+    <MenuItem value="">All</MenuItem>
+    {Array.from(new Set(contacts.map((c) => c.state).filter(Boolean))).map((state) => (
+      <MenuItem key={state} value={state}>
+        {state}
+      </MenuItem>
+    ))}
+  </TextField>
+
+  <TextField
+    label="City"
+    name="city"
+    select
+    value={filters.city}
+    onChange={(e) => setFilters({ ...filters, city: e.target.value })}
+    sx={{ minWidth: 140 ,width:"223px"}}
+  >
+    <MenuItem value="">All</MenuItem>
+    {Array.from(new Set(contacts.map((c) => c.city).filter(Boolean))).map((city) => (
+      <MenuItem key={city} value={city}>
+        {city}
+      </MenuItem>
+    ))}
+  </TextField>
+</Box>
+
+
 
       <Snackbar
         open={snackbar.open}
@@ -650,15 +752,51 @@ export function ContactView() {
         }}
       >
         <DataGrid
-          rows={contacts}
+          rows={filteredContacts}
           columns={columns}
           getRowId={(row) => row.id}
-          columnVisibilityModel={columnVisibilityModel}
           onColumnVisibilityModelChange={(model) => setColumnVisibilityModel(model)}
           checkboxSelection
           disableColumnMenu
           disableRowSelectionOnClick
-          slots={{ toolbar: GridToolbar }}
+slots={{ toolbar: CustomToolbar }}
+ disableColumnFilter={false}
+  disableColumnSelector={false} // ✅ show column menu
+  initialState={{
+    columns: {
+      columnVisibilityModel: {
+        id: true,
+        full_name: true,
+        phone: true,
+        email: true,
+        actions: true,
+
+         // hide all others by default
+        whatsapp: false,
+        alternate_email: false,
+        address: false,
+        city: false,
+        state: false,
+        postal_code: false,
+        country: false,
+        contact_type: false,
+        organization_name: false,
+        job_title: false,
+        department: false,
+        website: false,
+        linkedin: false,
+        facebook: false,
+        instagram: false,
+        relationship: false,
+        notes: false,
+        is_favorite: false,
+        is_active: false,
+        created_at: false,
+        updated_at: false,
+         },
+    },
+  }}
+
           sx={{
             border: 'none',
 
@@ -720,37 +858,32 @@ export function ContactView() {
         <DialogTitle>{formData.id ? 'Edit Contact' : 'Add Contact'}</DialogTitle>
         <DialogContent sx={{ pt: 2 }}>
           <Grid container spacing={2}>
-            <Grid sx={{ width: '32%' }}>
+            
+              
+           
+            <Grid sx={{ width: '12%' }}>
               <TextField
                 margin="dense"
-                name="first_name"
-                label="First Name"
+                name="name_title"
+                label="Title"
                 fullWidth
-                value={formData.first_name}
+                select
+                value={formData.name_title}
                 onChange={handleChange}
-              />
+               
+              >
+                <MenuItem value="Mr">Mr.</MenuItem>
+                <MenuItem value="Mrs">Mrs.</MenuItem>
+                                <MenuItem value="Ms">Ms.</MenuItem>
+                <MenuItem value="Miss">Miss.</MenuItem>
+                <MenuItem value="Er">Er.</MenuItem>
+                <MenuItem value="Dr">Dr.</MenuItem>
+                <MenuItem value="Adv">Adv.</MenuItem>
+                <MenuItem value="Prof">Prof.</MenuItem>
+
+              </TextField>
             </Grid>
-            <Grid sx={{ width: '32%' }}>
-              <TextField
-                margin="dense"
-                name="middle_name"
-                label="Middle Name"
-                fullWidth
-                value={formData.middle_name}
-                onChange={handleChange}
-              />
-            </Grid>
-            <Grid sx={{ width: '32%' }}>
-              <TextField
-                margin="dense"
-                name="last_name"
-                label="Last Name"
-                fullWidth
-                value={formData.last_name}
-                onChange={handleChange}
-              />
-            </Grid>
-            <Grid sx={{ width: '100%' }}>
+            <Grid sx={{ width: '86%' }}>
               <TextField
                 margin="dense"
                 name="full_name"
@@ -770,7 +903,7 @@ export function ContactView() {
               />
             </Grid>
 
-            <Grid sx={{ width: '32%' }}>
+            <Grid sx={{ width: '49%' }}>
               <TextField
                 margin="dense"
                 name="phone"
@@ -791,7 +924,26 @@ export function ContactView() {
                 }}
               />
             </Grid>
-            <Grid sx={{ width: '32%' }}>
+            <Grid sx={{ width: '49%' }}>
+              <TextField
+                margin="dense"
+                name="whatsapp"
+                label="WhatsApp Number"
+                fullWidth
+                error={Boolean(errors.whatsapp)}
+                helperText={errors.whatsapp ? 'WhatsApp is required' : ''}
+                value={formData.whatsapp ?? ''} // ✅ default empty string if undefined/null
+                onChange={(e) => {
+                  const value = (e.target.value ?? '').toString(); // ✅ always string
+                  setFormData({ ...formData, whatsapp: value });
+
+                  if (value.trim() !== '' && errors.whatsapp) {
+                    setErrors((prev) => ({ ...prev, whatsapp: false }));
+                  }
+                }}
+              />
+            </Grid>
+            {/* <Grid sx={{ width: '32%' }}>
               <TextField
                 margin="dense"
                 name="alternate_phone"
@@ -801,8 +953,8 @@ export function ContactView() {
                 value={formData.alternate_phone}
                 onChange={handleChange}
               />
-            </Grid>
-            <Grid sx={{ width: '32%' }}>
+            </Grid> */}
+            <Grid sx={{ width: '49%' }}>
               <TextField
                 margin="dense"
                 name="email"
@@ -823,43 +975,24 @@ export function ContactView() {
                 }}
               />
             </Grid>
-            <Grid sx={{ width: '49%' }}>
-              <TextField
-                margin="dense"
-                name="gender"
-                label="Gender"
-                select
-                fullWidth
-                value={formData.gender}
-                onChange={handleChange}
-              >
-                <MenuItem value="male">Male</MenuItem>
-                <MenuItem value="female">Female</MenuItem>
-              </TextField>
-            </Grid>
 
-            <Grid sx={{ width: '49%' }}>
+             <Grid sx={{ width: '49%' }}>
               <TextField
                 margin="dense"
-                name="date_of_birth"
-                type="date"
+                name="alternate_email"
+                label="Alternate Email"
+                type="text"
                 fullWidth
-                value={formData.date_of_birth}
+                 value={formData.alternate_email}
                 onChange={handleChange}
               />
             </Grid>
+            
+                       
 
-            <TextField
-              margin="dense"
-              name="address"
-              label="Address"
-              type="textarea"
-              fullWidth
-              multiline
-              rows={2}
-              value={formData.address}
-              onChange={handleChange}
-            />
+            
+
+           
 
             <Grid sx={{ width: '49%' }}>
               <TextField
@@ -925,16 +1058,36 @@ export function ContactView() {
                 onChange={handleChange}
               />
             </Grid>
+             <TextField
+              margin="dense"
+              name="address"
+              label="Address"
+              type="textarea"
+              fullWidth
+              multiline
+              rows={2}
+              value={formData.address}
+              onChange={handleChange}
+            />
 
             <Grid sx={{ width: '49%' }}>
               <TextField
-                margin="dense"
-                name="contact_type"
-                label="Contact Type"
-                fullWidth
-                value={formData.contact_type}
-                onChange={handleChange}
-              />
+  margin="dense"
+  name="contact_type"
+  label="Contact Type"
+  fullWidth
+  value={formData.contact_type}
+  onChange={handleChange}
+  select
+>
+  <MenuItem value="Business">Business</MenuItem>
+  <MenuItem value="Personal">Personal</MenuItem>
+  <MenuItem value="Company">Company</MenuItem>
+  <MenuItem value="Non-Profit">Non-Profit</MenuItem>
+  <MenuItem value="School">School</MenuItem>
+  <MenuItem value="Other">Other</MenuItem>
+</TextField>
+
             </Grid>
             <Grid sx={{ width: '49%' }}>
               <TextField
@@ -1004,26 +1157,8 @@ export function ContactView() {
                 onChange={handleChange}
               />
             </Grid>
-            <Grid sx={{ width: '49%' }}>
-              <TextField
-                margin="dense"
-                name="whatsapp"
-                label="WhatsApp Number"
-                fullWidth
-                error={Boolean(errors.whatsapp)}
-                helperText={errors.whatsapp ? 'WhatsApp is required' : ''}
-                value={formData.whatsapp ?? ''} // ✅ default empty string if undefined/null
-                onChange={(e) => {
-                  const value = (e.target.value ?? '').toString(); // ✅ always string
-                  setFormData({ ...formData, whatsapp: value });
-
-                  if (value.trim() !== '' && errors.whatsapp) {
-                    setErrors((prev) => ({ ...prev, whatsapp: false }));
-                  }
-                }}
-              />
-            </Grid>
-            <Grid sx={{ width: '49%' }}>
+            
+            <Grid sx={{ width: '100%' }}>
               <TextField
                 margin="dense"
                 name="relationship"

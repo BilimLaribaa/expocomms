@@ -30,14 +30,10 @@ const db = new sqlite3.Database("./contacts.db", (err) => {
   const createTableQuery = `
       CREATE TABLE IF NOT EXISTS contacts  (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        first_name TEXT,
-        last_name TEXT,
-        middle_name TEXT,
+        name_title TEXT,
         full_name TEXT,
         phone TEXT,
-        gender TEXT,
-        date_of_birth DATE,
-        alternate_phone TEXT,
+        alternate_email TEXT,
         address TEXT,
         city TEXT,
         state TEXT,
@@ -214,14 +210,10 @@ app.post("/api/contacts/import", (req, res) => {
   }
 
   const allowedFields = [
-    "first_name",
-    "last_name",
-    "middle_name",
+    "name_title",
     "full_name",
     "phone",
-    "gender",
-    "date_of_birth",
-    "alternate_phone",
+    "alternate_email",
     "address",
     "city",
     "state",
@@ -387,13 +379,7 @@ app.post(
       }
 
       // 🔐 Setup transporter for immediate sending
-      let transporter = nodemailer.createTransport({
-        service: "gmail", // or use SMTP server like 'smtp.mailgun.org'
-        auth: {
-          user: "aslamkhan1221@gmail.com", // 🔁 Replace with your Gmail
-          pass: "eipx qhvf tzme siqk", // 🔁 Use your Gmail app password
-        },
-      });
+ 
 
       const emailCSV = recipients.join(", ");
 

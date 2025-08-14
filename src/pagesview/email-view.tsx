@@ -3,10 +3,10 @@ import 'react-quill/dist/quill.snow.css';
 
 import ReactQuill from 'react-quill';
 import dayjs, { Dayjs } from 'dayjs';
-import ReactApexChart from 'react-apexcharts';
+import ReactApexChart from 'react-apexcharts';     
 import React, { useEffect, useState, useRef } from 'react';
 
-import SendIcon from '@mui/icons-material/Send';
+import SendIcon from '@mui/icons-material/Send';  
 import CloseIcon from '@mui/icons-material/Close';
 import EmailIcon from '@mui/icons-material/Email';
 import PhoneIcon from '@mui/icons-material/Phone';
@@ -228,19 +228,18 @@ export default function EmailViewPage() {
   }
 
   // Filter contacts based on search term
-  const filteredContacts = contacts.filter(
-    (contact) =>
-      contact.full_name.toLowerCase().includes(contactSearchTerm.toLowerCase()) ||
-      contact.email.toLowerCase().includes(contactSearchTerm.toLowerCase()) ||
-      contact.organization_name.toLowerCase().includes(contactSearchTerm.toLowerCase())
+  const filteredContacts = contacts.filter(contact =>
+    contact.full_name.toLowerCase().includes(contactSearchTerm.toLowerCase()) ||
+    contact.email.toLowerCase().includes(contactSearchTerm.toLowerCase()) ||
+    contact.organization_name.toLowerCase().includes(contactSearchTerm.toLowerCase())
   );
 
   // Handle contact selection
   const handleContactToggle = (contact: Contact) => {
-    setSelectedContacts((prev) => {
-      const isSelected = prev.find((c) => c.id === contact.id);
+    setSelectedContacts(prev => {
+      const isSelected = prev.find(c => c.id === contact.id);
       if (isSelected) {
-        return prev.filter((c) => c.id !== contact.id);
+        return prev.filter(c => c.id !== contact.id);
       } else {
         return [...prev, contact];
       }
@@ -249,7 +248,7 @@ export default function EmailViewPage() {
 
   // Update emails field when contacts are selected/deselected
   useEffect(() => {
-    const emailList = selectedContacts.map((contact) => contact.email).filter((email) => email);
+    const emailList = selectedContacts.map(contact => contact.email).filter(email => email);
     setEmails(emailList.join(', '));
   }, [selectedContacts]);
 
@@ -262,6 +261,8 @@ export default function EmailViewPage() {
 
     setSending(true);
     try {
+      const sendEmail = async () => {
+  const csrfToken = await getCsrfToken(); // ✅ Await the token
       const formData = new FormData();
       // If you allow passing arrays of emails from the UI, you can also send as CSV.
       formData.append('emails', emails);
@@ -279,9 +280,14 @@ export default function EmailViewPage() {
       attachments.forEach((file) => formData.append('attachments', file));
 
       const res = await fetch('http://localhost:3001/api/send-bulk-email', {
-        method: 'POST',
-        body: formData,
-      });
+         method: "POST",
+    body: formData,
+    credentials: 'include', // ✅ Send cookies
+    headers: {
+      "X-CSRF-Token": csrfToken // ✅ Required
+    },
+  });
+  
 
       const result = await res.json();
 
@@ -297,14 +303,17 @@ export default function EmailViewPage() {
         setMessage('');
         setAttachments([]);
         setSelectedContacts([]);
-        setComposerOpen(false);
-        setScheduleOpen(false);
-        await loadHistory();
-        await loadScheduledEmails();
-        await loadDeliveryStats();
+                 setComposerOpen(false);
+         setScheduleOpen(false);
+         await loadHistory();
+         await loadScheduledEmails();
+         await loadDeliveryStats();
       } else {
         setSnackbar({ open: true, message: result.error || 'Failed to send', severity: 'error' });
       }
+    };
+          await sendEmail(); // ✅ You must call the function here
+
     } catch (err) {
       console.error(err);
       setSnackbar({ open: true, message: 'Server error', severity: 'error' });
@@ -356,26 +365,28 @@ export default function EmailViewPage() {
     setSnackbar({ open: true, message: 'Draft loaded.', severity: 'success' });
   };
 
+  // CSRF token fetch (e.g., React frontend)
+const getCsrfToken = async () => {
+  const res = await fetch('http://localhost:3001/api/csrf-token', {
+    credentials: 'include' // ✅ Sends the cookie
+  });
+  const data = await res.json();
+  return data.csrfToken;
+};
+
+
   const cancelScheduledEmail = async (id: number) => {
     try {
       const res = await fetch(`http://localhost:3001/api/scheduled-emails/${id}`, {
         method: 'DELETE',
       });
-
+      
       if (res.ok) {
-        setSnackbar({
-          open: true,
-          message: 'Scheduled email cancelled successfully',
-          severity: 'success',
-        });
+        setSnackbar({ open: true, message: 'Scheduled email cancelled successfully', severity: 'success' });
         await loadScheduledEmails();
       } else {
         const result = await res.json();
-        setSnackbar({
-          open: true,
-          message: result.error || 'Failed to cancel email',
-          severity: 'error',
-        });
+        setSnackbar({ open: true, message: result.error || 'Failed to cancel email', severity: 'error' });
       }
     } catch (err) {
       console.error('Error cancelling scheduled email:', err);
@@ -387,53 +398,35 @@ export default function EmailViewPage() {
   // For Chips (MUI palette keys)
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'delivered':
-        return 'success';
-      case 'sent':
-        return 'primary';
-      case 'pending':
-        return 'warning';
-      case 'failed':
-        return 'error';
-      case 'bounced':
-        return 'error';
-      default:
-        return 'default';
+      case 'delivered': return 'success';
+      case 'sent': return 'primary';
+      case 'pending': return 'warning';
+      case 'failed': return 'error';
+      case 'bounced': return 'error';
+      default: return 'default';
     }
   };
 
   // For ApexCharts (hex colors)
   const getStatusHexColor = (status: string) => {
     switch (status) {
-      case 'delivered':
-        return '#4CAF50';
-      case 'sent':
-        return '#2196F3';
-      case 'pending':
-        return '#9E9E9E';
-      case 'failed':
-        return '#F44336';
-      case 'bounced':
-        return '#FF9800';
-      default:
-        return '#BDBDBD';
+      case 'delivered': return '#4CAF50';
+      case 'sent': return '#2196F3';
+      case 'pending': return '#9E9E9E';
+      case 'failed': return '#F44336';
+      case 'bounced': return '#FF9800';
+      default: return '#BDBDBD';
     }
   };
 
   const getStatusLabel = (status: string) => {
     switch (status) {
-      case 'delivered':
-        return 'Delivered';
-      case 'sent':
-        return 'Sent';
-      case 'pending':
-        return 'Pending';
-      case 'failed':
-        return 'Failed';
-      case 'bounced':
-        return 'Bounced';
-      default:
-        return status;
+      case 'delivered': return 'Delivered';
+      case 'sent': return 'Sent';
+      case 'pending': return 'Pending';
+      case 'failed': return 'Failed';
+      case 'bounced': return 'Bounced';
+      default: return status;
     }
   };
 
@@ -442,27 +435,25 @@ export default function EmailViewPage() {
     chart: {
       type: 'pie' as const,
     },
-    labels: deliveryStats.map((stat) => getStatusLabel(stat.status)),
-    colors: deliveryStats.map((stat) => getStatusHexColor(stat.status)),
+    labels: deliveryStats.map(stat => getStatusLabel(stat.status)),
+    colors: deliveryStats.map(stat => getStatusHexColor(stat.status)),
     legend: {
       position: 'bottom' as const,
     },
-    responsive: [
-      {
-        breakpoint: 480,
-        options: {
-          chart: {
-            width: 200,
-          },
-          legend: {
-            position: 'bottom',
-          },
+    responsive: [{
+      breakpoint: 480,
+      options: {
+        chart: {
+          width: 200
         },
-      },
-    ],
+        legend: {
+          position: 'bottom'
+        }
+      }
+    }]
   };
 
-  const pieChartSeries = deliveryStats.map((stat) => stat.count);
+  const pieChartSeries = deliveryStats.map(stat => stat.count);
 
   const handleOpenDeliveryTracking = () => {
     setDeliveryTrackingOpen(true);
@@ -471,37 +462,32 @@ export default function EmailViewPage() {
 
   return (
     <Box sx={{ display: 'flex', height: '100vh', overflow: 'hidden' }}>
+      
+
       {/* Contact Sidebar */}
-      <Box
-        sx={{
-          width: '300px',
-          bgcolor: 'background.paper',
-          borderRight: 1,
-          borderColor: 'divider',
-          display: 'flex',
-          flexDirection: 'column',
-          height: '100vh',
-        }}
-      >
+      <Box sx={{ 
+        width: '300px', 
+        bgcolor: 'background.paper',
+        borderRight: 1, 
+        borderColor: 'divider',
+        display: 'flex',
+        flexDirection: 'column',
+        height: '100vh'
+      }}>
         {/* Header */}
-        <Box
-          sx={{
-            p: 3,
-            borderBottom: 1,
-            borderColor: 'divider',
-            bgcolor: 'background.paper',
-            boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-          }}
-        >
-          <Typography
-            variant="h6"
-            sx={{
-              fontWeight: 600,
-              mb: 2,
-              color: 'text.primary',
-              fontSize: '1.1rem',
-            }}
-          >
+        <Box sx={{ 
+          p: 3, 
+          borderBottom: 1, 
+          borderColor: 'divider',
+          bgcolor: 'background.paper',
+          boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
+        }}>
+          <Typography variant="h6" sx={{ 
+            fontWeight: 600, 
+            mb: 2,
+            color: 'text.primary',
+            fontSize: '1.1rem'
+          }}>
             Contacts
           </Typography>
           <TextField
@@ -519,8 +505,8 @@ export default function EmailViewPage() {
                 },
                 '&.Mui-focused': {
                   bgcolor: 'white',
-                },
-              },
+                }
+              }
             }}
             InputProps={{
               startAdornment: (
@@ -531,15 +517,13 @@ export default function EmailViewPage() {
             }}
           />
         </Box>
-
+        
         {/* Contact List */}
-        <Box
-          sx={{
-            flex: 1,
-            overflowY: 'auto',
-            bgcolor: 'grey.50',
-          }}
-        >
+        <Box sx={{ 
+          flex: 1,
+          overflowY: 'auto',
+          bgcolor: 'grey.50'
+        }}>
           {contactsLoading ? (
             <Box display="flex" justifyContent="center" alignItems="center" p={4}>
               <CircularProgress size={32} />
@@ -553,7 +537,7 @@ export default function EmailViewPage() {
           ) : (
             <List sx={{ p: 0 }}>
               {filteredContacts.map((contact) => {
-                const isSelected = selectedContacts.find((c) => c.id === contact.id);
+                const isSelected = selectedContacts.find(c => c.id === contact.id);
                 return (
                   <ListItem
                     key={contact.id}
@@ -580,62 +564,54 @@ export default function EmailViewPage() {
                       '& .MuiListItemText-secondary': {
                         color: isSelected ? 'rgba(255,255,255,0.8)' : 'text.secondary',
                         fontSize: '0.8rem',
-                      },
+                      }
                     }}
                   >
                     <Checkbox
                       checked={!!isSelected}
                       size="small"
-                      sx={{
+                      sx={{ 
                         mr: 1,
                         color: isSelected ? 'white' : 'primary.main',
                         '&.Mui-checked': {
                           color: isSelected ? 'white' : 'primary.main',
-                        },
+                        }
                       }}
                     />
                     <ListItemAvatar sx={{ minWidth: 40 }}>
-                      <Avatar
-                        sx={{
-                          width: 32,
+                      <Avatar 
+                        sx={{ 
+                          width: 32, 
                           height: 32,
-                          bgcolor: contact.is_favorite
-                            ? 'warning.main'
-                            : isSelected
-                              ? 'white'
-                              : 'primary.main',
-                          color: contact.is_favorite
-                            ? 'white'
-                            : isSelected
-                              ? 'primary.main'
-                              : 'white',
+                          bgcolor: contact.is_favorite ? 'warning.main' : (isSelected ? 'white' : 'primary.main'),
+                          color: contact.is_favorite ? 'white' : (isSelected ? 'primary.main' : 'white'),
                           fontSize: '0.8rem',
-                          fontWeight: 600,
+                          fontWeight: 600
                         }}
                       >
-                        {contact.first_name.charAt(0).toUpperCase()}
+                        {contact.first_name?.charAt(0).toUpperCase() || ''}
                       </Avatar>
                     </ListItemAvatar>
                     <ListItemText
                       primary={contact.full_name}
                       secondary={
                         <Box>
-                          <Typography
-                            variant="body2"
-                            sx={{
+                          <Typography 
+                            variant="body2" 
+                            sx={{ 
                               fontSize: '0.75rem',
                               lineHeight: 1.2,
-                              mb: 0.5,
+                              mb: 0.5
                             }}
                           >
                             {contact.email}
                           </Typography>
                           {contact.organization_name && (
-                            <Typography
-                              variant="caption"
-                              sx={{
+                            <Typography 
+                              variant="caption" 
+                              sx={{ 
                                 fontSize: '0.7rem',
-                                opacity: 0.8,
+                                opacity: 0.8
                               }}
                             >
                               {contact.organization_name}
@@ -650,26 +626,21 @@ export default function EmailViewPage() {
             </List>
           )}
         </Box>
-
+        
         {/* Footer with selected count */}
         {selectedContacts.length > 0 && (
-          <Box
-            sx={{
-              p: 2,
-              borderTop: 1,
-              borderColor: 'divider',
-              bgcolor: 'background.paper',
-              boxShadow: '0 -1px 3px rgba(0,0,0,0.1)',
-            }}
-          >
-            <Typography
-              variant="body2"
-              sx={{
-                textAlign: 'center',
-                fontWeight: 500,
-                color: 'primary.main',
-              }}
-            >
+          <Box sx={{ 
+            p: 2, 
+            borderTop: 1, 
+            borderColor: 'divider',
+            bgcolor: 'background.paper',
+            boxShadow: '0 -1px 3px rgba(0,0,0,0.1)'
+          }}>
+            <Typography variant="body2" sx={{ 
+              textAlign: 'center',
+              fontWeight: 500,
+              color: 'primary.main'
+            }}>
               {selectedContacts.length} contact{selectedContacts.length !== 1 ? 's' : ''} selected
             </Typography>
           </Box>
@@ -685,15 +656,15 @@ export default function EmailViewPage() {
               Email
             </Typography>
             <Box display="flex" gap={2}>
-              <Button
-                variant="outlined"
+              <Button 
+                variant="outlined" 
                 startIcon={<AnalyticsIcon />}
                 onClick={handleOpenDeliveryTracking}
               >
                 Delivery Tracking
               </Button>
-              <Button
-                variant="contained"
+              <Button 
+                variant="contained" 
                 startIcon={<SendIcon />}
                 onClick={() => setComposerOpen(true)}
               >
@@ -746,45 +717,45 @@ export default function EmailViewPage() {
                   <CircularProgress />
                 </Box>
               ) : (
-                <TableContainer component={Paper}>
-                  <Table size="small">
-                    <TableHead>
-                      <TableRow>
-                        <TableCell>ID</TableCell>
-                        <TableCell>Recipients</TableCell>
-                        <TableCell>Subject</TableCell>
-                        <TableCell>Message</TableCell>
-                        <TableCell>Sent At</TableCell>
-                        <TableCell>Actions</TableCell>
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {emailLogs.map((log) => (
-                        <TableRow key={log.id}>
-                          <TableCell>{log.id}</TableCell>
-                          <TableCell>{log.emails.join(', ')}</TableCell>
-                          <TableCell>{log.subject}</TableCell>
-                          <TableCell>
-                            <div dangerouslySetInnerHTML={{ __html: log.message }} />
-                          </TableCell>
-                          <TableCell>{new Date(log.sent_at).toLocaleString()}</TableCell>
-                          <TableCell>
-                            <Button
-                              size="small"
-                              variant="outlined"
-                              onClick={() => {
-                                setDeliveryTrackingOpen(true);
-                                loadDeliveryLogs(log.id);
-                              }}
-                            >
-                              View Status
-                            </Button>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
+                                 <TableContainer component={Paper}>
+                   <Table size="small">
+                     <TableHead>
+                       <TableRow>
+                         <TableCell>ID</TableCell>
+                         <TableCell>Recipients</TableCell>
+                         <TableCell>Subject</TableCell>
+                         <TableCell>Message</TableCell>
+                         <TableCell>Sent At</TableCell>
+                         <TableCell>Actions</TableCell>
+                       </TableRow>
+                     </TableHead>
+                     <TableBody>
+                       {emailLogs.map((log) => (
+                         <TableRow key={log.id}>
+                           <TableCell>{log.id}</TableCell>
+                           <TableCell>{log.emails.join(', ')}</TableCell>
+                           <TableCell>{log.subject}</TableCell>
+                           <TableCell>
+                             <div dangerouslySetInnerHTML={{ __html: log.message }} />
+                           </TableCell>
+                           <TableCell>{new Date(log.sent_at).toLocaleString()}</TableCell>
+                           <TableCell>
+                             <Button
+                               size="small"
+                               variant="outlined"
+                               onClick={() => {
+                                 setDeliveryTrackingOpen(true);
+                                 loadDeliveryLogs(log.id);
+                               }}
+                             >
+                               View Status
+                             </Button>
+                           </TableCell>
+                         </TableRow>
+                       ))}
+                     </TableBody>
+                   </Table>
+                 </TableContainer>
               )}
             </>
           )}
@@ -839,9 +810,11 @@ export default function EmailViewPage() {
                 </TableContainer>
               )}
             </>
-          )}
-        </Box>
-      </Box>
+                     )}
+
+
+         </Box>
+       </Box>
 
       {/* Composer Modal */}
       <Modal open={composerOpen} onClose={() => setComposerOpen(false)}>
@@ -888,7 +861,7 @@ export default function EmailViewPage() {
               value={message}
               onChange={setMessage}
               theme="snow"
-              style={{ minHeight: 180 }}
+              style={{ minHeight: 180, height:"90px" }}
             />
 
             {/* attachments: hidden input + button */}
@@ -900,9 +873,9 @@ export default function EmailViewPage() {
               accept=".pdf,.docx,.jpg,.jpeg,.png"
               onChange={handleAttachmentChange}
             />
-            <Box display="flex" gap={2} alignItems="center">
-              <Button
-                variant="outlined"
+            <Box display="flex" gap={2} alignItems="center" sx={{marginTop:"30px"}}>
+              <Button 
+                variant="outlined" 
                 startIcon={<AttachFileIcon />}
                 onClick={() => fileInputRef.current?.click()}
               >
@@ -933,8 +906,8 @@ export default function EmailViewPage() {
                 {sending ? 'Sending...' : 'Send Now'}
               </Button>
 
-              <Button
-                variant="outlined"
+              <Button 
+                variant="outlined" 
                 startIcon={<ScheduleIcon />}
                 onClick={() => setScheduleOpen(true)}
               >
@@ -969,15 +942,15 @@ export default function EmailViewPage() {
           </Typography>
 
           <LocalizationProvider dateAdapter={AdapterDayjs}>
-            <DateTimePicker
-              value={scheduledTime}
-              onChange={(v) => setScheduledTime(v)}
-              slotProps={{
-                textField: {
-                  fullWidth: true,
-                },
-              }}
-            />
+          <DateTimePicker
+  value={scheduledTime}
+  onChange={(v) => setScheduledTime(v)}
+  slotProps={{
+    textField: {
+      fullWidth: true,
+    },
+  }}
+/>
           </LocalizationProvider>
 
           <Box display="flex" gap={2} mt={2}>
@@ -1045,11 +1018,7 @@ export default function EmailViewPage() {
                   <CircularProgress />
                 </Box>
               ) : deliveryStats.length === 0 ? (
-                <Typography
-                  variant="body2"
-                  color="text.secondary"
-                  sx={{ textAlign: 'center', py: 4 }}
-                >
+                <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center', py: 4 }}>
                   No delivery data available
                 </Typography>
               ) : (
@@ -1076,13 +1045,9 @@ export default function EmailViewPage() {
                   <CircularProgress />
                 </Box>
               ) : deliveryLogs.length === 0 ? (
-                <Typography
-                  variant="body2"
-                  color="text.secondary"
-                  sx={{ textAlign: 'center', py: 4 }}
-                >
-                  Click &quot;View Status&quot; on any sent email to see delivery logs
-                </Typography>
+                                 <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center', py: 4 }}>
+                   Click &quot;View Status&quot; on any sent email to see delivery logs
+                 </Typography>
               ) : (
                 <TableContainer component={Paper}>
                   <Table size="small">
@@ -1120,20 +1085,11 @@ export default function EmailViewPage() {
                           <TableCell>
                             {log.error_message ? (
                               <Tooltip title={log.error_message}>
-                                <Typography
-                                  variant="body2"
-                                  sx={{
-                                    maxWidth: 200,
-                                    overflow: 'hidden',
-                                    textOverflow: 'ellipsis',
-                                  }}
-                                >
+                                <Typography variant="body2" sx={{ maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis' }}>
                                   {log.error_message}
                                 </Typography>
                               </Tooltip>
-                            ) : (
-                              '-'
-                            )}
+                            ) : '-'}
                           </TableCell>
                           <TableCell>{log.retry_count}</TableCell>
                         </TableRow>

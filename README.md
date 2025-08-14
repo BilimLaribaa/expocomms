@@ -1,48 +1,80 @@
-## Minimal UI ([Free version](https://free.minimals.cc/))
+# Education Expo Communications Portal  
+*Requirements Document*
 
-![license](https://img.shields.io/badge/license-MIT-blue.svg)
+---
 
-![preview](public/assets/images/minimal-free-preview.jpg)
+## 1. Introduction
 
-> Free React Admin Dashboard made with Material-UI components and React + Vite.js.
+This document outlines the functional and non-functional requirements for the **Education Expo Communications Portal**. The portal will serve as a central platform to manage contacts and dispatch bulk communications (Email, WhatsApp, SMS) to stakeholders of the Education Expo.
 
-## Pages
+---
 
-- [Dashboard](https://free.minimals.cc/)
-- [Users](https://free.minimals.cc/user)
-- [Products](https://free.minimals.cc/products)
-- [Blog](https://free.minimals.cc/blog)
-- [Sign in](https://free.minimals.cc/sign-in)
-- [Not found](https://free.minimals.cc/404)
+## 2. Objectives
 
-## Quick start
+- Provide a unified interface for managing stakeholder contacts.
+- Support segmented bulk communication via Email, WhatsApp (via MsgClub API), and SMS.
+- Ensure data integrity, traceability, and efficiency in outreach efforts.
 
-- Clone the repo: `git clone https://github.com/minimal-ui-kit/material-kit-react.git`
-- Recommended: `Node.js v20.x`
-- **Install:** `npm i` or `yarn install`
-- **Start:** `npm run dev` or `yarn dev`
-- **Build:** `npm run build` or `yarn build`
-- Open browser: `http://localhost:3039`
+---
 
-## Upgrade to PRO Version
+## 3. Scope
 
-| Minimal Free                | [Minimal Pro](https://material-ui.com/store/items/minimal-dashboard/)                                   |
-| :-------------------------- | :------------------------------------------------------------------------------------------------------ |
-| **6** Pages                 | **70+** Pages                                                                                           |
-| **Partial** theme customize | **Fully** theme customize                                                                               |
-| -                           | **Next.js** version                                                                                     |
-| -                           | **TypeScript** version (Standard Plus and Extended license)                                             |
-| -                           | Design **Figma** file (Standard Plus and Extended license)                                              |
-| -                           | Authentication with **Amplify**, **Auth0**, **JWT**, **Firebase** and **Supabase**                      |
-| -                           | Light/dark mode, right-to-left, form validation... ([+more components](https://minimals.cc/components)) |
-| -                           | Complete users flows                                                                                    |
-| -                           | 1 year of free updates / 6 months of technical support                                                  |
-| -                           | Learn more: [Package & license](https://docs.minimals.cc/package)                                       |
+### In Scope
 
-## License
+- Contact management
+- Bulk Email sending
+- Bulk WhatsApp via MsgClub API
+- Bulk SMS sending
+- Delivery status logging and basic reporting
 
-Distributed under the [MIT](https://github.com/minimal-ui-kit/minimal.free/blob/main/LICENSE.md) license.
+### Out of Scope
 
-## Contact us
+- Event registration or ticketing workflows
+- Payment processing
+- Advanced marketing automation
 
-Email: support@minimals.cc
+---
+
+## 4. Actors & Roles
+
+- **Administrator**  
+  Full access to manage all data and settings.
+
+- **Communications Officer**  
+  Manage contacts and dispatch communications.
+
+- **System**  
+  Backend processes and job handling.
+
+---
+
+## 5. Technology Stack
+
+| Layer       | Technology             | Purpose                                  |
+|------------|------------------------|------------------------------------------|
+| Frontend    | React                  | UI development                           |
+| Backend     | Node.js + Express.js   | REST API and business logic              |
+| Database    | SQLite                 | Lightweight embedded database            |
+| Email       | Nodemailer (SMTP)      | Email dispatch via SMTP server           |
+| WhatsApp    | MsgClub API            | Bulk WhatsApp messaging                  |
+| SMS         | MsgClub / Twilio       | Bulk SMS messaging                       |
+| Scheduling  | node-cron / BullMQ     | Background jobs and retries              |
+
+---
+
+
+# TODOs
+
+# commit 1
+- Merge aslam branch to main
+
+# commit 2 (security commit)
+- Add sqlitedb to gitignore
+- make migration file
+- put api keys and credentials in email
+- make env Example
+
+# commit 3 database security commit
+put password on contact.db
+password on env
+
