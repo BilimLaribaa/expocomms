@@ -61,3 +61,10 @@ This document outlines the functional and non-functional requirements for the **
 | Scheduling  | node-cron / BullMQ     | Background jobs and retries              |
 
 ---
+
+
+# TODOs
+
+- Add sqlitedb to gitignore
+- make migration file
+- make env Example
