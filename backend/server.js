@@ -379,13 +379,7 @@ app.post(
       }
 
       // 🔐 Setup transporter for immediate sending
-      let transporter = nodemailer.createTransport({
-        service: "gmail", // or use SMTP server like 'smtp.mailgun.org'
-        auth: {
-          user: "aslamkhan1221@gmail.com", // 🔁 Replace with your Gmail
-          pass: "eipx qhvf tzme siqk", // 🔁 Use your Gmail app password
-        },
-      });
+ 
 
       const emailCSV = recipients.join(", ");
 

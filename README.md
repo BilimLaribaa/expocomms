@@ -61,3 +61,20 @@ This document outlines the functional and non-functional requirements for the **
 | Scheduling  | node-cron / BullMQ     | Background jobs and retries              |
 
 ---
+
+
+# TODOs
+
+# commit 1
+- Merge aslam branch to main
+
+# commit 2 (security commit)
+- Add sqlitedb to gitignore
+- make migration file
+- put api keys and credentials in email
+- make env Example
+
+# commit 3 database security commit
+put password on contact.db
+password on env
+
